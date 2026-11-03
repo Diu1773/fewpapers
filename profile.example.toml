@@ -1,0 +1,68 @@
+# Copy to profile.toml (committed) or profile.local.toml (git-ignored), or store the whole
+# file as the PAPER_RADAR_PROFILE repository secret to keep it private.
+# Ask Claude Code or Codex to fill this in from your repositories, drafts and notes.
+
+[profile]
+# What you are working on right now. The daily assistant reads this to decide
+# whether a paper touches your current work, so be concrete.
+interests = """
+Predicting capacity fade of lithium-ion cells from early cycling data, and using the
+predictions to shorten test plans for new cell designs.
+"""
+keywords = ["capacity fade", "battery degradation", "state of health", "cycle life", "lithium-ion"]
+exclude_keywords = []
+# Optional list of papers you already care about (.bib, .jsonl, .csv with title/abstract, or .txt)
+# library = "library.bib"
+
+[limits]
+candidates = 30          # how many pre-filtered candidates go to the assistant
+lookback_days = 7        # journals: publication-date window
+arxiv_lookback_days = 3  # arXiv: submission window (covers weekends)
+
+[sources.arxiv]
+categories = ["cond-mat.mtrl-sci", "physics.chem-ph"]
+
+[sources.openalex]
+# Journals to watch by ISSN, plus free-text searches across every venue OpenAlex indexes.
+issns = ["0378-7753", "0013-4651", "2352-152X"]  # J. Power Sources, J. Electrochem. Soc., J. Energy Storage
+queries = ["battery capacity fade", "state of health estimation"]
+# mailto = "you@example.org"   # optional; or set OPENALEX_MAILTO
+
+[sources.ads]
+# Used only when the ADS_TOKEN environment variable is set.
+# query = 'abs:("capacity fade" OR "battery degradation") collection:physics'
+
+# Optional second track: discoveries that may change a field or the world, caught early.
+# Remove this section, or set enabled = false, if you only want the work track.
+[landmark]
+enabled = true
+field = """
+Frontier science and technology that could change the world: new AI architectures and training
+paradigms, quantum computing milestones, and breakthroughs of similar reach in other fields.
+"""
+keywords = ["breakthrough", "first demonstration", "quantum error correction", "foundation model"]
+
+# Community-tracked ML papers (Hugging Face daily papers), ranked by upvotes, code stars, watched labs.
+labs = ["deepmind", "google", "openai", "anthropic", "meta", "microsoft", "nvidia", "deepseek", "qwen"]
+hf_days = 7          # re-read the last week of daily lists so late risers can surface
+min_upvotes = 30     # papers outside watched labs need at least this many upvotes
+candidates = 10
+
+# Top journals: this week's papers ranked by similarity to `field`, and recent papers already
+# gathering citations ("rising", up to rising_days old; skipped when replaying past dates).
+journals = ["0028-0836", "0036-8075", "0031-9007", "2691-3399", "2522-5839"]  # Nature, Science, PRL, PRX Quantum, Nat. Mach. Intell.
+journal_lookback_days = 7
+journal_candidates = 8
+rising = true
+rising_days = 90
+rising_min_citations = 5
+rising_candidates = 5
+
+# Lab blogs and science news: the newest `feed_max` posts of each feed within `lookback_days`.
+lookback_days = 3
+feed_max = 2
+feeds = [
+  { name = "OpenAI News", url = "https://openai.com/news/rss.xml" },
+  { name = "Google Research Blog", url = "https://research.google/blog/rss/" },
+  { name = "Quanta Magazine", url = "https://www.quantamagazine.org/feed/" },
+]

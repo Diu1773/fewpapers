@@ -1,0 +1,70 @@
+# Private runner: copy into a private repository as .github/workflows/daily.yml.
+# Secrets: PAPER_RADAR_PROFILE, GIST_TOKEN (classic token with only the gist scope).
+# Variable: GIST_ID (an existing secret gist; latest.md is replaced after each run).
+name: daily candidates
+
+on:
+  schedule:
+    - cron: "0 21 * * *"   # 21:00 UTC
+  workflow_dispatch:
+    inputs:
+      no_state:
+        description: "do not read or update the seen list (test run)"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+concurrency:
+  group: daily-candidates
+  cancel-in-progress: false
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      GIST_TOKEN: ${{ secrets.GIST_TOKEN }}
+      GIST_ID: ${{ vars.GIST_ID }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: Diu1773/paper-radar
+          path: code
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Collect and pre-filter
+        env:
+          PAPER_RADAR_PROFILE: ${{ secrets.PAPER_RADAR_PROFILE }}
+          ADS_TOKEN: ${{ secrets.ADS_TOKEN }}
+          OPENALEX_MAILTO: ${{ secrets.OPENALEX_MAILTO }}
+          OPENALEX_API_KEY: ${{ secrets.OPENALEX_API_KEY }}
+          PYTHONPATH: code
+        run: python -m paper_radar collect --out output --state state/seen.json ${{ inputs.no_state && '--no-state' || '' }}
+      - name: Commit candidates
+        if: ${{ !inputs.no_state }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add output state
+          if git diff --cached --quiet; then
+            echo "no change"
+          else
+            git commit -m "candidates $(date -u +%F)"
+            git push
+          fi
+      - name: Publish latest.md to the secret gist
+        if: ${{ env.GIST_TOKEN != '' && env.GIST_ID != '' }}
+        run: |
+          python - <<'PY'
+          import json, os, urllib.request
+          body = json.dumps({"files": {"latest.md": {"content": open("output/latest.md", encoding="utf-8").read()}}}).encode()
+          req = urllib.request.Request(
+              f"https://api.github.com/gists/{os.environ['GIST_ID']}", data=body, method="PATCH",
+              headers={"Authorization": f"Bearer {os.environ['GIST_TOKEN']}", "Accept": "application/vnd.github+json"})
+          with urllib.request.urlopen(req) as r:
+              print("gist updated", r.status)
+          PY

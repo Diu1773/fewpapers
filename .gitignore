@@ -1,0 +1,7 @@
+profile.local.toml
+__pycache__/
+*.pyc
+.venv/
+*.local.md
+docs/release/
+reports/

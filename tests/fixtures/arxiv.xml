@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>arXiv Query</title>
+  <entry>
+    <id>http://arxiv.org/abs/2611.01234v1</id>
+    <published>2026-11-01T17:00:00Z</published>
+    <title>Capacity fade
+      from cycling data</title>
+    <summary>  We predict capacity fade.  </summary>
+    <author><name>A. Author</name></author>
+    <author><name>B. Author</name></author>
+    <category term="cond-mat.mtrl-sci"/>
+    <category term="physics.chem-ph"/>
+  </entry>
+  <entry>
+    <id>http://arxiv.org/abs/2611.05678v3</id>
+    <published>2026-11-02T10:00:00Z</published>
+    <title>Another paper</title>
+    <summary>Text.</summary>
+    <author><name>C. Author</name></author>
+    <category term="physics.chem-ph"/>
+  </entry>
+</feed>
