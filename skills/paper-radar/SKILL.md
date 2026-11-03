@@ -16,7 +16,7 @@ code stars, watched labs, lab blogs). The pick is the part that needs judgment.
    Without a checkout, open the raw URL of `output/latest.md` the user gave.
 2. Get the instructions: run
    `python -m paper_radar prompt --url output/latest.md --lang <user's language> --n-work N --n-landmark M`
-   (the user's numbers; defaults 5 and 3). It prints the selection rules and reply shape built from
+   (the user's numbers; defaults 3 and 3). It prints the selection rules and reply shape built from
    the user's profile. Follow them exactly: a work pick needs one concrete sentence on which part
    of the user's work it touches; a landmark pick must plausibly change how the field works.
    Zero picks is a valid answer. Judge only from title, abstract and signals.

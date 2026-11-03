@@ -81,7 +81,7 @@ Your profile says what you are working on. Decide where it may be seen before yo
 ```bash
 python -m paper_radar                 # collect (same as: collect)
 python -m paper_radar check           # validate profile, try each source, resolve ISSNs
-python -m paper_radar prompt --url URL --lang ko --n-work 5 --n-landmark 3
+python -m paper_radar prompt --url URL --lang ko --n-work 3 --n-landmark 3
 python -m unittest discover -s tests
 ```
 

@@ -177,7 +177,7 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--profile")
     p.add_argument("--url", required=True, help="raw URL (or local path) of output/latest.md")
     p.add_argument("--lang", default="en", help="reply language code, e.g. en, ko")
-    p.add_argument("--n-work", type=int, default=5)
+    p.add_argument("--n-work", type=int, default=3)
     p.add_argument("--n-landmark", type=int, default=3)
     p.set_defaults(func=cmd_prompt)
 

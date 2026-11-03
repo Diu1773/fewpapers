@@ -25,7 +25,7 @@ Ask which of the two tracks they want, and the few facts each needs:
   computing milestone). Ask the field(s), then offer the defaults in `profile.example.toml`: watched
   labs, top journals (add the field's own flagship journals), and lab blog or science news feeds.
 
-Also ask: how many picks per day per track (defaults: work 5, landmark 3) and the reply language.
+Also ask: how many picks per day per track (defaults: work 3, landmark 3) and the reply language.
 
 Write `profile.local.toml` (git-ignored) from `profile.example.toml`. Keep `interests` to a
 concrete paragraph. Run `python -m paper_radar check` and fix anything it flags, then run
