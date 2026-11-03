@@ -9,9 +9,8 @@ Two tracks, either or both:
 - **landmark**: the few that may change your field or the world, caught early (think of the
   Transformer or GPT-3 papers in their first week, or a quantum error-correction milestone).
 
-Most digests send ten "related" papers a day and get ignored after a week. paper-radar sends at
-most a handful, each with one sentence on why it matters to you, and sends nothing on days when
-nothing qualifies.
+paper-radar sends at most a handful, each with one sentence on why it matters to you, and sends
+nothing on days when nothing qualifies.
 
 ## Fastest start
 
