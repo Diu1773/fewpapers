@@ -1,11 +1,11 @@
 # Notes for coding agents (Claude Code, Codex, others)
 
-This repository is paper-radar: a free daily collector (`python -m paper_radar`) plus a daily pick
+This repository is fewpapers: a free daily collector (`python -m fewpapers`) plus a daily pick
 done by the user's own AI assistant. Python 3.11+, standard library only.
 Tests: `python -m unittest discover -s tests`.
 
 When the user asks to set it up ("set this up", "설정해 줘", or opens the repo with no profile),
-follow the setup below. For the daily pick itself, follow `skills/paper-radar/SKILL.md`.
+follow the setup below. For the daily pick itself, follow `skills/fewpapers/SKILL.md`.
 
 ## Setup
 
@@ -28,8 +28,8 @@ Ask which of the two tracks they want, and the few facts each needs:
 Also ask: how many picks per day per track (defaults: work 3, landmark 3) and the reply language.
 
 Write `profile.local.toml` (git-ignored) from `profile.example.toml`. Keep `interests` to a
-concrete paragraph. Run `python -m paper_radar check` and fix anything it flags, then run
-`python -m paper_radar collect --no-state --out /tmp-or-scratch-dir` and show the user the top ten
+concrete paragraph. Run `python -m fewpapers check` and fix anything it flags, then run
+`python -m fewpapers collect --no-state --out /tmp-or-scratch-dir` and show the user the top ten
 titles of each track. Adjust keywords, journals, labs or `min_upvotes` until they look right.
 
 ### 2. Where the collector runs
@@ -39,9 +39,9 @@ the profile, so in a public repository anyone can read it and infer their topics
 
 | option | when to choose | what you do |
 | --- | --- | --- |
-| GitHub Actions, public repository | the user has GitHub, the computer may be off at collection time, and the list may be seen | with the user's yes: `gh repo create <name> --public --source . --push`, `gh secret set PAPER_RADAR_PROFILE < profile.local.toml`, `gh workflow run daily.yml`, then confirm `output/latest.md` was committed |
-| GitHub Actions, private repository + secret gist | as above, but the list must stay private | with the user's yes: create a private repository holding only `examples/private-runner.yml` as `.github/workflows/daily.yml` (plus empty `output/` and `state/`), `gh secret set PAPER_RADAR_PROFILE`, create a secret gist with `gh gist create` and store its id as the `GIST_ID` variable. The user creates a classic token with only the `gist` scope and stores it as the `GIST_TOKEN` secret; never ask them to paste it to you. Run the workflow once and confirm the gist changed |
-| This machine only | no GitHub, and the daily pick runs here | nothing to host; the daily pick runs `python -m paper_radar` first |
+| GitHub Actions, public repository | the user has GitHub, the computer may be off at collection time, and the list may be seen | with the user's yes: `gh repo create <name> --public --source . --push`, `gh secret set FEWPAPERS_PROFILE < profile.local.toml`, `gh workflow run daily.yml`, then confirm `output/latest.md` was committed |
+| GitHub Actions, private repository + secret gist | as above, but the list must stay private | with the user's yes: create a private repository holding only `examples/private-runner.yml` as `.github/workflows/daily.yml` (plus empty `output/` and `state/`), `gh secret set FEWPAPERS_PROFILE`, create a secret gist with `gh gist create` and store its id as the `GIST_ID` variable. The user creates a classic token with only the `gist` scope and stores it as the `GIST_TOKEN` secret; never ask them to paste it to you. Run the workflow once and confirm the gist changed |
+| This machine only | no GitHub, and the daily pick runs here | nothing to host; the daily pick runs `python -m fewpapers` first |
 
 The profile goes into the secret, never into a repository, unless the user says otherwise. Before
 the first push, check that git commits with a no-reply email (`git config user.email`).
@@ -60,16 +60,16 @@ Ask where they want the daily result. Explain the cost in one line each:
 
 Then set it up:
 
-- **ChatGPT**: run `python -m paper_radar prompt --url <URL> --lang <code> --n-work N --n-landmark M`,
+- **ChatGPT**: run `python -m fewpapers prompt --url <URL> --lang <code> --n-work N --n-landmark M`,
   where URL is `https://raw.githubusercontent.com/<owner>/<repo>/main/output/latest.md` (public
   repository) or `https://gist.githubusercontent.com/<owner>/<gist id>/raw/latest.md` (secret gist),
   and give the user the text with two instructions: paste it into a new ChatGPT chat, and ask
   ChatGPT to run it every day at the chosen time (a time after 21:30 UTC). If a browser tool
   connected to the user's own Chrome is available and the user says yes, you may open
   chatgpt.com in their signed-in session and do this for them; stop if a sign-in is needed.
-- **Claude cloud routine / desktop task / Codex**: install the skill (copy `skills/paper-radar`
+- **Claude cloud routine / desktop task / Codex**: install the skill (copy `skills/fewpapers`
   into `~/.claude/skills/` or `~/.codex/skills/`) and schedule the prompt
-  "Run the paper-radar daily pick for <repo path or URL>" at the chosen time.
+  "Run the fewpapers daily pick for <repo path or URL>" at the chosen time.
 
 ### 4. Confirm
 

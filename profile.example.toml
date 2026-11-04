@@ -1,5 +1,5 @@
 # Copy to profile.toml (committed) or profile.local.toml (git-ignored), or store the whole
-# file as the PAPER_RADAR_PROFILE repository secret to keep it private.
+# file as the FEWPAPERS_PROFILE repository secret to keep it private.
 # Ask Claude Code or Codex to fill this in from your repositories, drafts and notes.
 
 [profile]

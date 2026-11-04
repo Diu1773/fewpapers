@@ -5,12 +5,12 @@ import unittest
 from datetime import date
 from pathlib import Path
 
-from paper_radar.profile import ENV_PROFILE, load_profile
-from paper_radar.prompt import build_prompt
-from paper_radar.rank import load_library, score_landmark, score_papers
-from paper_radar.sources import (Paper, abstract_from_inverted_index, newest_per_feed, parse_arxiv_atom,
+from fewpapers.profile import ENV_PROFILE, load_profile
+from fewpapers.prompt import build_prompt
+from fewpapers.rank import load_library, score_landmark, score_papers
+from fewpapers.sources import (Paper, abstract_from_inverted_index, newest_per_feed, parse_arxiv_atom,
                                  parse_feed, parse_hf_daily)
-from paper_radar.store import dedupe, filter_unseen, render_markdown, update_seen, write_outputs
+from fewpapers.store import dedupe, filter_unseen, render_markdown, update_seen, write_outputs
 
 FIX = Path(__file__).parent / "fixtures"
 
@@ -28,7 +28,7 @@ class TestSources(unittest.TestCase):
 
     def test_openalex_splits_journals_only_when_one_page_is_not_enough(self):
         from unittest import mock
-        from paper_radar import sources
+        from fewpapers import sources
 
         def work(i):
             return {"id": f"https://openalex.org/W{i}", "title": f"T{i}", "publication_date": "2026-11-01"}

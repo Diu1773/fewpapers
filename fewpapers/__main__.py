@@ -1,8 +1,8 @@
-"""paper-radar: collect and pre-filter new papers, check a profile, or print the daily-pick prompt.
+"""fewpapers: collect and pre-filter new papers, check a profile, or print the daily-pick prompt.
 
-  python -m paper_radar [collect]          fetch, merge, pre-filter, write output/latest.md
-  python -m paper_radar check              validate the profile and try every source once
-  python -m paper_radar prompt --url URL   print the prompt for an assistant's scheduled task
+  python -m fewpapers [collect]          fetch, merge, pre-filter, write output/latest.md
+  python -m fewpapers check              validate the profile and try every source once
+  python -m fewpapers prompt --url URL   print the prompt for an assistant's scheduled task
 """
 from __future__ import annotations
 
@@ -157,7 +157,7 @@ def main(argv: list[str] | None = None) -> int:
     argv = list(sys.argv[1:] if argv is None else argv)
     if not argv or argv[0].startswith("-"):
         argv.insert(0, "collect")
-    ap = argparse.ArgumentParser(prog="paper_radar", description=__doc__,
+    ap = argparse.ArgumentParser(prog="fewpapers", description=__doc__,
                                  formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = ap.add_subparsers(dest="cmd", required=True)
 

@@ -11,7 +11,7 @@ import tomllib
 from dataclasses import dataclass, field
 from pathlib import Path
 
-ENV_PROFILE = "PAPER_RADAR_PROFILE"
+ENV_PROFILE = "FEWPAPERS_PROFILE"
 
 
 @dataclass

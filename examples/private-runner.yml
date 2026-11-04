@@ -1,5 +1,5 @@
 # Private runner: copy into a private repository as .github/workflows/daily.yml.
-# Secrets: PAPER_RADAR_PROFILE, GIST_TOKEN (classic token with only the gist scope).
+# Secrets: FEWPAPERS_PROFILE, GIST_TOKEN (classic token with only the gist scope).
 # Variable: GIST_ID (an existing secret gist; latest.md is replaced after each run).
 name: daily candidates
 
@@ -31,19 +31,19 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/checkout@v4
         with:
-          repository: Diu1773/paper-radar
+          repository: Diu1773/fewpapers
           path: code
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
       - name: Collect and pre-filter
         env:
-          PAPER_RADAR_PROFILE: ${{ secrets.PAPER_RADAR_PROFILE }}
+          FEWPAPERS_PROFILE: ${{ secrets.FEWPAPERS_PROFILE }}
           ADS_TOKEN: ${{ secrets.ADS_TOKEN }}
           OPENALEX_MAILTO: ${{ secrets.OPENALEX_MAILTO }}
           OPENALEX_API_KEY: ${{ secrets.OPENALEX_API_KEY }}
           PYTHONPATH: code
-        run: python -m paper_radar collect --out output --state state/seen.json ${{ inputs.no_state && '--no-state' || '' }}
+        run: python -m fewpapers collect --out output --state state/seen.json ${{ inputs.no_state && '--no-state' || '' }}
       - name: Commit candidates
         if: ${{ !inputs.no_state }}
         run: |

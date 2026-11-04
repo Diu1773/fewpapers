@@ -13,7 +13,7 @@ from dataclasses import dataclass, field
 from datetime import date, datetime, timedelta
 from email.utils import parsedate_to_datetime
 
-USER_AGENT = "Mozilla/5.0 (compatible; paper-radar/0.2)"
+USER_AGENT = "Mozilla/5.0 (compatible; fewpapers/0.2)"
 TIMEOUT = 60
 
 

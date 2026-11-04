@@ -23,11 +23,11 @@ jobs:
           python-version: "3.12"
       - name: Collect and pre-filter
         env:
-          PAPER_RADAR_PROFILE: ${{ secrets.PAPER_RADAR_PROFILE }}
+          FEWPAPERS_PROFILE: ${{ secrets.FEWPAPERS_PROFILE }}
           ADS_TOKEN: ${{ secrets.ADS_TOKEN }}
           OPENALEX_MAILTO: ${{ secrets.OPENALEX_MAILTO }}
           OPENALEX_API_KEY: ${{ secrets.OPENALEX_API_KEY }}
-        run: python -m paper_radar
+        run: python -m fewpapers
       - name: Commit candidates
         run: |
           git config user.name "github-actions[bot]"

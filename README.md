@@ -1,4 +1,4 @@
-# paper-radar
+# fewpapers
 
 A short daily list of new papers worth your time, from every venue, judged by the AI assistant
 you already pay for. No API keys, no server.
@@ -9,7 +9,7 @@ Two tracks, either or both:
 - **landmark**: the few that may change your field or the world, caught early (think of the
   Transformer or GPT-3 papers in their first week, or a quantum error-correction milestone).
 
-paper-radar sends at most a handful, each with one sentence on why it matters to you, and sends
+fewpapers sends at most a handful, each with one sentence on why it matters to you, and sends
 nothing on days when nothing qualifies.
 
 ## Fastest start
@@ -32,7 +32,7 @@ ChatGPT scheduled task, a Claude routine, a Codex automation, or just GitHub.
      the newest posts of lab blogs and science news you follow.
    - Papers already listed are not listed again for 90 days.
 2. **Pick (your assistant).** A scheduled task reads the file and applies the rules printed by
-   `python -m paper_radar prompt`: a work pick needs one concrete sentence on which part of your
+   `python -m fewpapers prompt`: a work pick needs one concrete sentence on which part of your
    work it touches; a landmark pick must plausibly change how the field works. Zero is allowed.
 
 ```
@@ -50,7 +50,7 @@ Nothing today.
 Your profile says what you are working on. Decide where it may be seen before you set up.
 
 - Keep the profile out of git: `profile.local.toml` is ignored, and Actions reads it from the
-  `PAPER_RADAR_PROFILE` secret. Do not commit a filled-in `profile.toml` to a public repository.
+  `FEWPAPERS_PROFILE` secret. Do not commit a filled-in `profile.toml` to a public repository.
 - The daily candidate list (`output/`, `state/`) is derived from the profile. In a public
   repository anyone can read it and infer your topics. Choose one:
   - public repository: simplest; the list is visible;
@@ -66,22 +66,22 @@ Your profile says what you are working on. Decide where it may be seen before yo
 ## Manual setup
 
 1. Copy `profile.example.toml` to `profile.local.toml` and edit it.
-   `python -m paper_radar check` validates it and tries every source.
-2. Push the repository to GitHub, store the profile as the `PAPER_RADAR_PROFILE` secret
-   (`gh secret set PAPER_RADAR_PROFILE < profile.local.toml`), and run the **daily candidates**
+   `python -m fewpapers check` validates it and tries every source.
+2. Push the repository to GitHub, store the profile as the `FEWPAPERS_PROFILE` secret
+   (`gh secret set FEWPAPERS_PROFILE < profile.local.toml`), and run the **daily candidates**
    workflow once. Optional secrets: `ADS_TOKEN`, `OPENALEX_MAILTO`, `OPENALEX_API_KEY` (free;
    without it OpenAlex returns at most 200 works per journal and per search in one run).
    To keep the candidate list private, see [Privacy](#privacy).
 3. Print your prompt and schedule it in your assistant:
-   `python -m paper_radar prompt --url https://raw.githubusercontent.com/<you>/<repo>/main/output/latest.md --lang en`
-   Claude Code and Codex users can install `skills/paper-radar` instead.
+   `python -m fewpapers prompt --url https://raw.githubusercontent.com/<you>/<repo>/main/output/latest.md --lang en`
+   Claude Code and Codex users can install `skills/fewpapers` instead.
 
 ## Commands
 
 ```bash
-python -m paper_radar                 # collect (same as: collect)
-python -m paper_radar check           # validate profile, try each source, resolve ISSNs
-python -m paper_radar prompt --url URL --lang ko --n-work 3 --n-landmark 3
+python -m fewpapers                 # collect (same as: collect)
+python -m fewpapers check           # validate profile, try each source, resolve ISSNs
+python -m fewpapers prompt --url URL --lang ko --n-work 3 --n-landmark 3
 python -m unittest discover -s tests
 ```
 
