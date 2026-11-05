@@ -197,6 +197,29 @@ class TestProfile(unittest.TestCase):
         finally:
             del os.environ[ENV_PROFILE]
 
+    def test_collect_fails_when_a_whole_track_fails_but_still_writes(self):
+        from unittest import mock
+        from fewpapers import __main__ as cli
+
+        def down(*a, **k):
+            raise OSError("HTTP Error 429")
+
+        lm = [("feeds", lambda: [paper("A lab post")], lambda ps: ps, 5)]
+        os.environ[ENV_PROFILE] = ('[profile]\nkeywords = ["capacity fade"]\n[sources.arxiv]\n'
+                                   'categories = ["cond-mat.mtrl-sci"]\n[landmark]\nenabled = true\n')
+        try:
+            with tempfile.TemporaryDirectory() as d, mock.patch.object(cli, "_landmark_jobs", lambda p, t: lm):
+                with mock.patch.object(cli, "fetch_arxiv", down):
+                    code = cli.main(["collect", "--out", d, "--no-state"])
+                    md = (Path(d) / "latest.md").read_text(encoding="utf-8")
+                self.assertEqual(code, 1)
+                self.assertIn("arxiv (OSError)", md)
+                self.assertIn("A lab post", md)  # the track that worked is still listed
+                with mock.patch.object(cli, "fetch_arxiv", lambda *a, **k: []):
+                    self.assertEqual(cli.main(["collect", "--out", d, "--no-state"]), 0)
+        finally:
+            del os.environ[ENV_PROFILE]
+
     def test_example_profile_loads(self):
         p = load_profile(str(Path(__file__).parent.parent / "profile.example.toml"))
         self.assertTrue(p.interests and p.arxiv_categories and p.openalex_issns)

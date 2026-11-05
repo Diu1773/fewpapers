@@ -2,7 +2,7 @@ name: daily candidates
 
 on:
   schedule:
-    - cron: "0 21 * * *"   # 21:00 UTC
+    - cron: "23 17 * * *"   # 17:23 UTC; scheduled runs can start hours late, so leave room before the morning read
   workflow_dispatch:
 
 permissions:
@@ -29,6 +29,7 @@ jobs:
           OPENALEX_API_KEY: ${{ secrets.OPENALEX_API_KEY }}
         run: python -m fewpapers
       - name: Commit candidates
+        if: ${{ !cancelled() && hashFiles('output/latest.md') != '' }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"

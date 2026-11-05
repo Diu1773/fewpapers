@@ -5,7 +5,7 @@ name: daily candidates
 
 on:
   schedule:
-    - cron: "0 21 * * *"   # 21:00 UTC
+    - cron: "23 17 * * *"   # 17:23 UTC; scheduled runs can start hours late, so leave room before the morning read
   workflow_dispatch:
     inputs:
       no_state:
@@ -45,7 +45,7 @@ jobs:
           PYTHONPATH: code
         run: python -m fewpapers collect --out output --state state/seen.json ${{ inputs.no_state && '--no-state' || '' }}
       - name: Commit candidates
-        if: ${{ !inputs.no_state }}
+        if: ${{ !cancelled() && !inputs.no_state && hashFiles('output/latest.md') != '' }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -57,7 +57,7 @@ jobs:
             git push
           fi
       - name: Publish latest.md to the secret gist
-        if: ${{ env.GIST_TOKEN != '' && env.GIST_ID != '' }}
+        if: ${{ !cancelled() && env.GIST_TOKEN != '' && env.GIST_ID != '' && hashFiles('output/latest.md') != '' }}
         run: |
           python - <<'PY'
           import json, os, urllib.request
@@ -65,6 +65,15 @@ jobs:
           req = urllib.request.Request(
               f"https://api.github.com/gists/{os.environ['GIST_ID']}", data=body, method="PATCH",
               headers={"Authorization": f"Bearer {os.environ['GIST_TOKEN']}", "Accept": "application/vnd.github+json"})
-          with urllib.request.urlopen(req) as r:
-              print("gist updated", r.status)
+          import time
+          for attempt in range(5):
+              try:
+                  with urllib.request.urlopen(req, timeout=60) as r:
+                      print("gist updated", r.status)
+                  break
+              except Exception as e:
+                  print("gist attempt", attempt + 1, "failed:", e)
+                  if attempt == 4:
+                      raise
+                  time.sleep(30 * (attempt + 1))
           PY

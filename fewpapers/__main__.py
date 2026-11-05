@@ -78,14 +78,16 @@ def cmd_collect(args) -> int:
     seen = {} if args.no_state else load_seen(state_path)
     sections, errors, stats = {}, {}, {"fetched": 0, "unique": 0, "unseen": 0}
     taken: set[str] = set()
-    n_jobs = 0
+    dead_tracks = []
 
     if prof.landmark.enabled:
         listed = []
-        for name, fetch, rank, slots in _landmark_jobs(prof, today):
-            n_jobs += 1
+        lm_jobs = _landmark_jobs(prof, today)
+        lm_failed = 0
+        for name, fetch, rank, slots in lm_jobs:
             fetched, err, _ = _run_jobs([(name, fetch)])
             errors.update(err)
+            lm_failed += bool(err)
             unique = dedupe(fetched)
             unseen = [p for p in filter_unseen(unique, seen) if not any(k in taken for k in keys(p))]
             top = rank(unseen)[:slots]
@@ -94,12 +96,15 @@ def cmd_collect(args) -> int:
             stats["fetched"] += len(fetched); stats["unique"] += len(unique); stats["unseen"] += len(unseen)
             print(f"landmark/{name}: {len(fetched)} -> {len(top)} listed", file=sys.stderr)
         sections["landmark"] = listed
+        if lm_jobs and lm_failed == len(lm_jobs):
+            dead_tracks.append("landmark")
 
     if prof.work_enabled:
         jobs = _work_jobs(prof, today)
-        n_jobs += len(jobs)
         fetched, err, counts = _run_jobs(jobs)
         errors.update(err)
+        if jobs and len(err) == len(jobs):
+            dead_tracks.append("work")
         unique = dedupe(fetched)
         unseen = [p for p in filter_unseen(unique, seen) if not any(k in taken for k in keys(p))]
         library = load_library(prof.base_dir / prof.library) if prof.library else []
@@ -113,7 +118,10 @@ def cmd_collect(args) -> int:
         state_path.parent.mkdir(parents=True, exist_ok=True)
         shown = [p for ps in sections.values() for p in ps]
         state_path.write_text(json.dumps(update_seen(seen, shown, today), indent=0, sort_keys=True), encoding="utf-8")
-    return 1 if n_jobs and len(errors) == n_jobs else 0
+    if dead_tracks:
+        print("every source failed for: " + ", ".join(dead_tracks), file=sys.stderr)
+        return 1
+    return 0
 
 
 def cmd_check(args) -> int:
