@@ -44,8 +44,8 @@ LANG_NAME = {"en": "English", "ko": "Korean", "ja": "Japanese", "zh": "Chinese",
 
 def build_prompt(prof: Profile, url: str = "", lang: str = "en", n_work: int = 3, n_landmark: int = 3,
                  repo: str = "") -> str:
-    """`url` for a file readable without sign-in; `repo` (owner/name) for a private repository read through
-    the assistant's GitHub app."""
+    """url: address of output/latest.md. repo: the repository that holds it, such as me/runner, opened
+    with the assistant's GitHub app."""
     t = T
     head = [t["open_repo"], t["repo_file"].format(repo=repo)] if repo else [t["open"], url]
     lines = head + ["", t["about"], ""]
