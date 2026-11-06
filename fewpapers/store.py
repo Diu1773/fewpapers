@@ -10,6 +10,7 @@ from .sources import Paper
 
 SOURCE_RANK = {"openalex": 0, "ads": 1, "hf": 2, "arxiv": 3, "feed": 4}  # prefer the journal record when duplicates meet
 ABSTRACT_CHARS = 900
+AFFILIATIONS_SHOWN = 4
 
 
 def norm_title(t: str) -> str:
@@ -40,6 +41,8 @@ def dedupe(papers: list[Paper]) -> list[Paper]:
                 hit.abstract = p.abstract
             if not hit.arxiv_id and p.arxiv_id:
                 hit.arxiv_id = p.arxiv_id
+            if not hit.affiliations and p.affiliations:
+                hit.affiliations = p.affiliations
             for k, v in p.signals.items():
                 hit.signals.setdefault(k, v)
             for k in ks:
@@ -117,6 +120,11 @@ def render_markdown(sections: dict[str, list[Paper]], today: date, stats: dict, 
                 f"- venue: {p.venue} | date: {p.published} | score: {p.score}",
                 f"- authors: {authors}" if authors else "- authors: (not listed)",
             ]
+            if p.affiliations:
+                firms = [a for a in p.affiliations if a.endswith(" (company)")]
+                shown = (firms + [a for a in p.affiliations if a not in firms])[:AFFILIATIONS_SHOWN]
+                more = len(p.affiliations) - len(shown)
+                lines.append("- affiliations: " + "; ".join(shown) + (f"; +{more} more" if more > 0 else ""))
             if sig:
                 lines.append(f"- signals: {sig}")
             lines += [f"- link: {p.url}", "", ab or "(no abstract available)", ""]

@@ -61,6 +61,30 @@ class TestSources(unittest.TestCase):
         self.assertEqual(ps[0].title, "Capacity fade from cycling data")
         self.assertEqual(ps[0].authors, ["A. Author", "B. Author"])
         self.assertEqual(ps[0].venue, "arXiv cond-mat.mtrl-sci")
+        self.assertEqual(ps[0].affiliations, ["Cell Works Inc."])  # repeated affiliation kept once
+        self.assertEqual(ps[1].affiliations, [])
+
+    def test_openalex_affiliations_mark_companies_and_fill_missing(self):
+        from unittest import mock
+        from fewpapers import sources
+        w = {"doi": "https://doi.org/10.1/x", "authorships": [
+            {"institutions": [{"display_name": "Cell Works", "type": "company"}]},
+            {"institutions": [{"display_name": "Some University", "type": "education"},
+                              {"display_name": "Cell Works", "type": "company"}]}]}
+        self.assertEqual(sources.openalex_affiliations(w), ["Cell Works (company)", "Some University"])
+        a, b = paper("A", doi="10.1/x"), paper("B", doi="10.1/y")
+        b.affiliations = ["Kept Lab"]
+        urls = []
+        def fake_get(url, headers=None):
+            urls.append(url)
+            return json.dumps({"results": [w]}).encode()
+        with mock.patch.object(sources, "_get", fake_get):
+            self.assertEqual(sources.add_affiliations([a, b]), 1)
+        self.assertEqual(len(urls), 1)  # only the paper without affiliations is asked for
+        self.assertIn("10.1%2Fx", urls[0])
+        self.assertNotIn("10.1%2Fy", urls[0])
+        self.assertEqual(a.affiliations, ["Cell Works (company)", "Some University"])
+        self.assertEqual(b.affiliations, ["Kept Lab"])
 
 
 class TestStore(unittest.TestCase):
@@ -90,6 +114,13 @@ class TestStore(unittest.TestCase):
         self.assertIn("2026-11-03", md.splitlines()[0])
         self.assertIn("ads (HTTPError)", md)
         self.assertLess(len(md), 1500)
+
+    def test_markdown_lists_companies_first_and_caps_affiliations(self):
+        p = paper("T", "x")
+        p.affiliations = ["U1", "U2", "Firm (company)", "U3", "U4", "U5"]
+        md = render_markdown({"work": [p]}, date(2026, 11, 3), {}, {})
+        self.assertIn("- affiliations: Firm (company); U1; U2; U3; +2 more", md)
+        self.assertNotIn("affiliations", render_markdown({"work": [paper("T", "x")]}, date(2026, 11, 3), {}, {}))
 
     def test_write_outputs_prunes_archive(self):
         with tempfile.TemporaryDirectory() as d:

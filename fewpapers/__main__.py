@@ -15,7 +15,7 @@ from pathlib import Path
 from .profile import Profile, load_profile
 from .prompt import build_prompt
 from .rank import load_library, score_landmark, score_papers
-from .sources import (fetch_ads, fetch_arxiv, fetch_feeds, fetch_hf_daily, fetch_openalex,
+from .sources import (add_affiliations, fetch_ads, fetch_arxiv, fetch_feeds, fetch_hf_daily, fetch_openalex,
                       fetch_openalex_rising, newest_per_feed)
 from .store import dedupe, filter_unseen, keys, load_seen, update_seen, write_outputs
 
@@ -113,6 +113,14 @@ def cmd_collect(args) -> int:
         stats["fetched"] += len(fetched); stats["unique"] += len(unique); stats["unseen"] += len(unseen)
         print(f"work: {counts} -> {len(top)} listed", file=sys.stderr)
 
+    listed_all = [p for ps in sections.values() for p in ps]
+    try:
+        n = add_affiliations(listed_all, prof.openalex_mailto)
+        print(f"affiliations: {sum(bool(p.affiliations) for p in listed_all)} of {len(listed_all)} listed ({n} looked up)",
+              file=sys.stderr)
+    except Exception as e:  # affiliations are extra; a failed lookup does not stop the run
+        errors["affiliations"] = type(e).__name__
+        print(f"affiliations: failed ({e})", file=sys.stderr)
     write_outputs(Path(args.out), sections, today, stats, errors)
     if not args.no_state:
         state_path.parent.mkdir(parents=True, exist_ok=True)

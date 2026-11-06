@@ -28,6 +28,7 @@ class Paper:
     doi: str = ""
     arxiv_id: str = ""
     authors: list[str] = field(default_factory=list)
+    affiliations: list[str] = field(default_factory=list)  # institutions, companies marked " (company)"
     score: float = 0.0
     signals: dict = field(default_factory=dict)
 
@@ -59,9 +60,14 @@ def _clean(s: str | None) -> str:
     return re.sub(r"\s+", " ", s or "").strip()
 
 
+def _unique(items) -> list[str]:
+    return list(dict.fromkeys(i for i in items if i))
+
+
 # arXiv ----------------------------------------------------------------------
 
 ATOM = "{http://www.w3.org/2005/Atom}"
+ARXIV = "{http://arxiv.org/schemas/atom}"
 
 
 def parse_arxiv_atom(xml_bytes: bytes) -> list[Paper]:
@@ -82,6 +88,8 @@ def parse_arxiv_atom(xml_bytes: bytes) -> list[Paper]:
             arxiv_id=aid,
             doi=f"10.48550/arxiv.{aid}".lower(),
             authors=[_clean(a.findtext(f"{ATOM}name")) for a in e.findall(f"{ATOM}author")],
+            affiliations=_unique(_clean(x.text) for a in e.findall(f"{ATOM}author")
+                                 for x in a.findall(f"{ARXIV}affiliation")),
         ))
     return out
 
@@ -114,6 +122,12 @@ def abstract_from_inverted_index(inv: dict | None) -> str:
     return " ".join(slots[i] for i in sorted(slots))
 
 
+def openalex_affiliations(w: dict) -> list[str]:
+    """Institutions of all authors in author order; companies are marked so they can be told apart."""
+    return _unique(i.get("display_name", "") + (" (company)" if i.get("type") == "company" else "")
+                   for a in (w.get("authorships") or []) for i in (a.get("institutions") or []))
+
+
 def _openalex_paper(w: dict) -> Paper:
     loc = w.get("primary_location") or {}
     src = loc.get("source") or {}
@@ -127,6 +141,7 @@ def _openalex_paper(w: dict) -> Paper:
         source="openalex",
         doi=doi,
         authors=[(a.get("author") or {}).get("display_name", "") for a in (w.get("authorships") or [])][:12],
+        affiliations=openalex_affiliations(w),
         signals={"citations": w["cited_by_count"]} if "cited_by_count" in w else {},
     )
 
@@ -197,6 +212,27 @@ def fetch_openalex_rising(issns: list[str], days: int, today: date, min_citation
         params["api_key"] = os.environ["OPENALEX_API_KEY"]
     data = json.loads(_get("https://api.openalex.org/works?" + urllib.parse.urlencode(params)))
     return [_openalex_paper(w) for w in data.get("results", [])][:cap]
+
+
+def add_affiliations(papers: list[Paper], mailto: str = "", chunk: int = 50) -> int:
+    """Fill missing affiliations from OpenAlex by DOI, in a few batched requests.
+    Recent preprints are often not indexed yet or carry partial affiliations. Returns how many were filled."""
+    todo = [p for p in papers if not p.affiliations and p.doi]
+    filled = 0
+    for i in range(0, len(todo), chunk):
+        part = todo[i:i + chunk]
+        params = {"filter": "doi:" + "|".join(p.doi for p in part), "per-page": chunk, "select": "doi,authorships"}
+        if mailto:
+            params["mailto"] = mailto
+        if os.environ.get("OPENALEX_API_KEY"):
+            params["api_key"] = os.environ["OPENALEX_API_KEY"]
+        data = json.loads(_get("https://api.openalex.org/works?" + urllib.parse.urlencode(params)))
+        by_doi = {(w.get("doi") or "").replace("https://doi.org/", "").lower(): w for w in data.get("results", [])}
+        for p in part:
+            aff = openalex_affiliations(by_doi.get(p.doi, {}))
+            if aff:
+                p.affiliations, filled = aff, filled + 1
+    return filled
 
 
 # NASA ADS -------------------------------------------------------------------

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<feed xmlns="http://www.w3.org/2005/Atom">
+<feed xmlns="http://www.w3.org/2005/Atom" xmlns:arxiv="http://arxiv.org/schemas/atom">
   <title>arXiv Query</title>
   <entry>
     <id>http://arxiv.org/abs/2611.01234v1</id>
@@ -7,8 +7,8 @@
     <title>Capacity fade
       from cycling data</title>
     <summary>  We predict capacity fade.  </summary>
-    <author><name>A. Author</name></author>
-    <author><name>B. Author</name></author>
+    <author><name>A. Author</name><arxiv:affiliation>Cell Works Inc.</arxiv:affiliation></author>
+    <author><name>B. Author</name><arxiv:affiliation>Cell Works Inc.</arxiv:affiliation></author>
     <category term="cond-mat.mtrl-sci"/>
     <category term="physics.chem-ph"/>
   </entry>
