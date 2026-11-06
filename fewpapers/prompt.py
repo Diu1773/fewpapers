@@ -29,6 +29,7 @@ T = {
     "shape": "Reply in {lang} in exactly this shape and nothing else (no greeting, no recap of the list):",
     "empty": "If a track has no pick, write one line saying so under its heading. If the file cannot be "
              "opened or its first line is more than two days old, reply with one line saying so.",
+    "echo": ["<the file's first line, copied exactly>", "<the file's line that starts with \"Fetched\", copied exactly>", ""],
     "why_work": "<one sentence: where it touches my work>",
     "why_lm": "<one sentence: what changes if it holds up>",
 }
@@ -50,6 +51,6 @@ def build_prompt(prof: Profile, url: str, lang: str = "en", n_work: int = 3, n_l
         lines += [t["lm_head"], field, "", t["lm_rule"].format(n=n_landmark), ""]
         shape += ["[landmark]", "1. <short title> (<org or venue>)", f"   {t['why_lm']}", "   <link>", ""]
     lines += [t["zero"], "", t["shape"].format(lang=LANG_NAME.get(lang, lang)), ""]
-    lines += shape
+    lines += t["echo"] + shape
     lines += [t["empty"]]
     return "\n".join(lines).strip() + "\n"

@@ -152,6 +152,7 @@ class TestPrompt(unittest.TestCase):
         self.assertIn("Korean", text)
         self.assertIn("[work]", text)
         self.assertIn("[landmark]", text)
+        self.assertLess(text.index("copied exactly"), text.index("[work]"))  # the reply opens with the file's own lines
 
 
 class TestRank(unittest.TestCase):
