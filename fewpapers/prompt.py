@@ -5,6 +5,10 @@ from .profile import Profile
 
 T = {
     "open": "Open this file and read all of it:",
+    "open_repo": "Use the GitHub app to read this file in full. It is in a private repository, so do not use "
+                 "web search, the browser or code downloads for it. If the GitHub app cannot open it, try once "
+                 "more before reporting the error.",
+    "repo_file": "Repository {repo}, branch main, file output/latest.md",
     "about": "It lists today's paper candidates in up to two tracks. Scores and signals only order "
              "the candidates; they do not decide importance.",
     "work_head": "Track work - my current work:",
@@ -38,9 +42,13 @@ LANG_NAME = {"en": "English", "ko": "Korean", "ja": "Japanese", "zh": "Chinese",
              "fr": "French", "es": "Spanish"}
 
 
-def build_prompt(prof: Profile, url: str, lang: str = "en", n_work: int = 3, n_landmark: int = 3) -> str:
+def build_prompt(prof: Profile, url: str = "", lang: str = "en", n_work: int = 3, n_landmark: int = 3,
+                 repo: str = "") -> str:
+    """`url` for a file readable without sign-in; `repo` (owner/name) for a private repository read through
+    the assistant's GitHub app."""
     t = T
-    lines = [t["open"], url, "", t["about"], ""]
+    head = [t["open_repo"], t["repo_file"].format(repo=repo)] if repo else [t["open"], url]
+    lines = head + ["", t["about"], ""]
     shape = []
     if prof.work_enabled:
         interests = prof.interests or ", ".join(prof.keywords)

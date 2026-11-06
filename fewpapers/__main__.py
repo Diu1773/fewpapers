@@ -165,7 +165,7 @@ def cmd_check(args) -> int:
 
 def cmd_prompt(args) -> int:
     prof = load_profile(args.profile)
-    sys.stdout.write(build_prompt(prof, args.url, args.lang, args.n_work, args.n_landmark))
+    sys.stdout.write(build_prompt(prof, args.url or "", args.lang, args.n_work, args.n_landmark, args.repo or ""))
     return 0
 
 
@@ -191,7 +191,9 @@ def main(argv: list[str] | None = None) -> int:
 
     p = sub.add_parser("prompt", help="print the scheduled-task prompt")
     p.add_argument("--profile")
-    p.add_argument("--url", required=True, help="raw URL (or local path) of output/latest.md")
+    where = p.add_mutually_exclusive_group(required=True)
+    where.add_argument("--url", help="raw URL (or local path) of output/latest.md")
+    where.add_argument("--repo", help="owner/name of a private repository the assistant reads through its GitHub app")
     p.add_argument("--lang", default="en", help="reply language code, e.g. en, ko")
     p.add_argument("--n-work", type=int, default=3)
     p.add_argument("--n-landmark", type=int, default=3)

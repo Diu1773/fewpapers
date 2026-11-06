@@ -54,9 +54,9 @@ Your profile says what you are working on. Decide where it may be seen before yo
 - The daily candidate list (`output/`, `state/`) is derived from the profile. In a public
   repository anyone can read it and infer your topics. Choose one:
   - public repository: simplest; the list is visible;
-  - private repository + secret gist: `examples/private-runner.yml` keeps the list private and
-    sends only `latest.md` to a secret gist (unlisted; anyone with its address can read it), so an
-    assistant can read it without signing in. Needs a classic token with only the `gist` scope;
+  - private repository: `examples/private-runner.yml` keeps the list in a private repository, and
+    the assistant reads it through its GitHub app (`python -m fewpapers prompt --repo <owner>/<name>`).
+    Give the app access to that one repository only;
   - this computer only: nothing leaves the machine, but it must be on at collection time.
 - Commit history keeps what was once pushed. Removing a file later does not remove it from earlier
   commits; set a no-reply commit email before the first push.

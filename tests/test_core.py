@@ -184,6 +184,14 @@ class TestPrompt(unittest.TestCase):
         self.assertIn("[work]", text)
         self.assertIn("[landmark]", text)
         self.assertLess(text.index("copied exactly"), text.index("[work]"))  # the reply opens with the file's own lines
+        os.environ[ENV_PROFILE] = '[profile]\ninterests = "battery capacity fade"\n'
+        try:
+            private = build_prompt(load_profile(), repo="me/runner")
+        finally:
+            del os.environ[ENV_PROFILE]
+        self.assertIn("GitHub app", private)
+        self.assertIn("Repository me/runner, branch main, file output/latest.md", private)
+        self.assertNotIn("http", private.split("\n\n")[0])
 
 
 class TestRank(unittest.TestCase):

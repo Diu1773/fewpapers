@@ -40,7 +40,7 @@ the profile, so in a public repository anyone can read it and infer their topics
 | option | when to choose | what you do |
 | --- | --- | --- |
 | GitHub Actions, public repository | the user has GitHub, the computer may be off at collection time, and the list may be seen | with the user's yes: `gh repo create <name> --public --source . --push`, `gh secret set FEWPAPERS_PROFILE < profile.local.toml`, `gh workflow run daily.yml`, then confirm `output/latest.md` was committed |
-| GitHub Actions, private repository + secret gist | as above, but the list must stay private | with the user's yes: create a private repository holding only `examples/private-runner.yml` as `.github/workflows/daily.yml` (plus empty `output/` and `state/`), `gh secret set FEWPAPERS_PROFILE`, create a secret gist with `gh gist create` and store its id as the `GIST_ID` variable. The user creates a classic token with only the `gist` scope and stores it as the `GIST_TOKEN` secret; never ask them to paste it to you. Run the workflow once and confirm the gist changed |
+| GitHub Actions, private repository | as above, but the list must stay private | with the user's yes: create a private repository holding only `examples/private-runner.yml` as `.github/workflows/daily.yml` (plus empty `output/` and `state/`), `gh secret set FEWPAPERS_PROFILE`, run the workflow once and confirm `output/latest.md` was committed. The assistant reads it through its GitHub app; the user connects the app and limits it to this repository |
 | This machine only | no GitHub, and the daily pick runs here | nothing to host; the daily pick runs `python -m fewpapers` first |
 
 The profile goes into the secret, never into a repository, unless the user says otherwise. Before
@@ -52,7 +52,7 @@ Ask where they want the daily result. Explain the cost in one line each:
 
 | option | runs | reaches the phone | uses |
 | --- | --- | --- | --- |
-| ChatGPT scheduled task | ChatGPT's servers | ChatGPT app notification | the ChatGPT plan, no Claude/Codex usage; needs a URL readable without sign-in (public raw URL or secret gist) |
+| ChatGPT scheduled task | ChatGPT's servers | ChatGPT app notification | the ChatGPT plan, no Claude/Codex usage; reads a public raw URL, or a private repository through the ChatGPT GitHub app |
 | Claude cloud routine (`/schedule` in Claude Code) | Anthropic's cloud on the repo | Claude app | Claude plan usage |
 | Claude desktop scheduled task | this computer, while the app is open | phone only when Remote Control is on | Claude plan usage |
 | Codex scheduled automation, if the user's Codex app offers one | Codex | Codex app | Codex plan usage |
@@ -60,10 +60,11 @@ Ask where they want the daily result. Explain the cost in one line each:
 
 Then set it up:
 
-- **ChatGPT**: run `python -m fewpapers prompt --url <URL> --lang <code> --n-work N --n-landmark M`,
-  where URL is `https://raw.githubusercontent.com/<owner>/<repo>/main/output/latest.md` (public
-  repository) or `https://gist.githubusercontent.com/<owner>/<gist id>/raw/latest.md` (secret gist),
-  and give the user the text with two instructions: paste it into a new ChatGPT chat, and ask
+- **ChatGPT**: run `python -m fewpapers prompt --url <URL> --lang <code> --n-work N --n-landmark M`
+  with `https://raw.githubusercontent.com/<owner>/<repo>/main/output/latest.md` for a public
+  repository, or `--repo <owner>/<name>` instead of `--url` for a private one. Scheduled runs do
+  not reliably open private links such as secret gists, so the private route goes through the
+  ChatGPT GitHub app, which the user connects first. Then give the user the text with two instructions: paste it into a new ChatGPT chat, and ask
   ChatGPT to run it every day at the chosen time (a time after 21:30 UTC). If a browser tool
   connected to the user's own Chrome is available and the user says yes, you may open
   chatgpt.com in their signed-in session and do this for them; stop if a sign-in is needed.
