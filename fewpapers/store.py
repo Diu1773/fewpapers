@@ -75,7 +75,7 @@ def update_seen(seen: dict[str, str], shown: list[Paper], today: date, keep_days
 TRACK_NOTES = {
     "work": "Ranked by text similarity to the reader's current work. Scores order candidates; they do not judge importance.",
     "landmark": "In order: recent top-journal papers already gathering citations (rising); community-tracked "
-                "papers ranked by upvotes, code stars and watched labs; this week's top-journal papers ranked by "
+                "papers that passed an upvote, code-star or watched-lab bar; this week's top-journal papers ranked by "
                 "similarity to the field; the newest posts of each followed feed. Signals show early attention, "
                 "not lasting importance.",
 }

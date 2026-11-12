@@ -57,7 +57,8 @@ Write `profile.local.toml` (git-ignored) from `profile.example.toml`:
 - Landmark: write `field` from answer 3. The example's labs, feeds and journals are for AI and
   quantum computing. For any other field, replace them: the field's flagship journals plus Nature
   and Science in `journals`, its labs or organisations in `labs` (or none), and its society news or
-  lab blogs in `feeds` (or none). Keep `rising` on. Hugging Face daily papers are machine learning
+  lab blogs in `feeds` (or none). Keep `rising` on, and set `follow_field = true` when the field is
+  specific (batteries, protein design) rather than broad (frontier science). Hugging Face daily papers are machine learning
   only: unless the field is machine learning itself, set `candidates` to 3, or 0 if they want no
   machine-learning papers.
 

@@ -33,6 +33,7 @@ class Landmark:
     rising_days: int = 90
     rising_min_citations: int = 5
     rising_candidates: int = 5
+    follow_field: bool = False  # order rising and community papers by similarity to `field` too
 
 
 @dataclass
@@ -96,6 +97,7 @@ def _from_dict(d: dict, base_dir: Path) -> Profile:
             rising_days=int(lm.get("rising_days", 90)),
             rising_min_citations=int(lm.get("rising_min_citations", 5)),
             rising_candidates=int(lm.get("rising_candidates", 5)),
+            follow_field=bool(lm.get("follow_field", False)),
         ),
         base_dir=base_dir,
     )

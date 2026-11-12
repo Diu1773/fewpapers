@@ -42,6 +42,10 @@ paradigms, quantum computing milestones, and breakthroughs of similar reach in o
 """
 keywords = ["breakthrough", "first demonstration", "quantum error correction", "foundation model"]
 
+# For a specific field (batteries, not "frontier science"), also order the rising and community parts
+# by closeness to `field` instead of by attention alone.
+follow_field = false
+
 # Community-tracked ML papers (Hugging Face daily papers), ranked by upvotes, code stars, watched labs.
 labs = ["deepmind", "google", "openai", "anthropic", "meta", "microsoft", "nvidia", "deepseek", "qwen"]
 hf_days = 7          # re-read the last week of daily lists so late risers can surface

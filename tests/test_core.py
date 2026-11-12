@@ -272,7 +272,8 @@ class TestProfile(unittest.TestCase):
     def test_landmark_attention_lists_follow_the_field(self):
         from fewpapers import __main__ as cli
         from fewpapers.profile import Landmark
-        lm = Landmark(enabled=True, topic="lithium-ion battery energy storage", keywords=["battery"])
+        lm = Landmark(enabled=True, topic="lithium-ion battery energy storage", keywords=["battery"],
+                      follow_field=True)
         a, b = paper("Speech recognition at scale", "audio transcription model"), paper(
             "Solid-state battery with long cycle life", "energy storage cells")
         a.score, b.score = 0.9, 0.2
@@ -280,6 +281,10 @@ class TestProfile(unittest.TestCase):
         self.assertEqual([p.title for p in out][0], "Solid-state battery with long cycle life")
         self.assertEqual(b.signals["attention"], 0.2)  # the attention score is kept as a signal
         self.assertEqual(cli._by_field([a], Landmark()), [a])  # no field: order unchanged
+        c, d = paper("Speech recognition at scale", "audio"), paper("Solid-state battery", "energy storage")
+        c.score, d.score = 0.9, 0.2
+        off = Landmark(enabled=True, topic="lithium-ion battery energy storage", keywords=["battery"])
+        self.assertEqual(cli._by_field([c, d], off), [c, d])  # off by default: attention order kept
 
     def test_example_profile_loads(self):
         p = load_profile(str(Path(__file__).parent.parent / "profile.example.toml"))

@@ -53,7 +53,8 @@ def _landmark_jobs(prof: Profile, today: date) -> list:
     parts = []
     if lm.rising and lm.journals and today >= real_today - timedelta(days=2):
         parts.append(("rising", lambda: fetch_openalex_rising(lm.journals, lm.rising_days, today,
-                                                              lm.rising_min_citations, 200, prof.openalex_mailto),
+                                                              lm.rising_min_citations, 200 if lm.follow_field else 50,
+                                                              prof.openalex_mailto),
                       lambda ps: [_mark(p, "rising") for p in _by_field(ps, lm, _citation_weight)],
                       lm.rising_candidates))
     parts.append(("hf_daily", lambda: fetch_hf_daily(lm.hf_days, today),
@@ -77,9 +78,10 @@ def _citation_weight(p) -> float:
 
 
 def _by_field(papers: list, lm, weight=_attention_weight) -> list:
-    """Order papers by similarity to the landmark field, blended half and half with their attention
-    (upvotes and stars, or citations) so that neither alone decides."""
-    if not lm.topic or not papers:
+    """With `follow_field`, order papers by similarity to the landmark field, blended half and half with
+    their attention (upvotes and stars, or citations) so that neither alone decides. Otherwise keep the
+    attention order, which suits a broad field better."""
+    if not lm.follow_field or not lm.topic or not papers:
         return papers
     attention = {id(p): p.score for p in papers}
     ranked = score_papers(papers, lm.topic, lm.keywords, [], [])
