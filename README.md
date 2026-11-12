@@ -26,7 +26,7 @@ ChatGPT scheduled task, a Claude routine, a Codex automation, or just GitHub.
 ## How it works
 
 1. **Collect and pre-filter (free, no model).** A GitHub Actions job runs daily and commits
-   `output/latest.md` with about 30 + 15 candidates and their abstracts.
+   `output/latest.md` with about 30 + 25 candidates and their abstracts.
    - work: arXiv categories, journals by ISSN and free-text searches across all venues via
      OpenAlex, and NASA ADS (optional); merged, corrections dropped, ranked by text similarity to
      your profile.
@@ -83,7 +83,7 @@ Your profile says what you are working on. Decide where it may be seen before yo
 1. Copy `profile.example.toml` to `profile.local.toml` and edit it.
    `python -m fewpapers check` validates it and tries every source.
 2. Push the repository to GitHub, store the profile as the `FEWPAPERS_PROFILE` secret
-   (`gh secret set FEWPAPERS_PROFILE < profile.local.toml`), and run the **daily candidates**
+   (`gh secret set FEWPAPERS_PROFILE < profile.local.toml`; in PowerShell `Get-Content -Raw profile.local.toml | gh secret set FEWPAPERS_PROFILE`), and run the **daily candidates**
    workflow once. Optional secrets: `ADS_TOKEN`, `OPENALEX_MAILTO`, `OPENALEX_API_KEY` (free;
    without it OpenAlex returns at most 200 works per journal and per search in one run).
    To keep the candidate list private, see [Privacy](#privacy).

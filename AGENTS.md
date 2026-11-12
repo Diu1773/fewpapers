@@ -39,8 +39,8 @@ the profile, so in a public repository anyone can read it and infer their topics
 
 | option | when to choose | what you do |
 | --- | --- | --- |
-| GitHub Actions, public repository | the user has GitHub, the computer may be off at collection time, and the list may be seen | with the user's yes: `gh repo create <name> --public --source . --push`, `gh secret set FEWPAPERS_PROFILE < profile.local.toml`, `gh workflow run daily.yml`, then confirm `output/latest.md` was committed |
-| GitHub Actions, private repository | as above, but the list must stay private | with the user's yes: create a private repository holding only `examples/private-runner.yml` as `.github/workflows/daily.yml` (plus empty `output/` and `state/`), `gh secret set FEWPAPERS_PROFILE`, run the workflow once and confirm `output/latest.md` was committed. The assistant reads it through its GitHub app; the user connects the app and limits it to this repository |
+| GitHub Actions, public repository | the user has GitHub, the computer may be off at collection time, and the list may be seen | with the user's yes: `gh repo create <name> --public --source . --push`, `gh secret set FEWPAPERS_PROFILE < profile.local.toml` (PowerShell: `Get-Content -Raw profile.local.toml | gh secret set FEWPAPERS_PROFILE`), `gh workflow run daily.yml`, then confirm `output/latest.md` was committed |
+| GitHub Actions, private repository | as above, but the list must stay private | with the user's yes: create a private repository holding only `examples/private-runner.yml` as `.github/workflows/daily.yml` (plus `output/.gitkeep` and `state/.gitkeep`, since git does not keep empty folders), the same `gh secret set FEWPAPERS_PROFILE`, run the workflow once and confirm `output/latest.md` was committed. The assistant reads it through its GitHub app; the user connects the app and limits it to this repository |
 | This machine only | no GitHub, and the daily pick runs here | nothing to host; the daily pick runs `python -m fewpapers` first |
 
 The profile goes into the secret, never into a repository, unless the user says otherwise. Before
@@ -65,7 +65,7 @@ Then set it up:
   repository, or `--repo <owner>/<name>` instead of `--url` for a private one. Scheduled runs do
   not reliably open private links such as secret gists, so the private route goes through the
   ChatGPT GitHub app, which the user connects first. Then give the user the text with two instructions: paste it into a new ChatGPT chat, and ask
-  ChatGPT to run it every day at the chosen time (a time after 21:30 UTC). If a browser tool
+  ChatGPT to run it every day at the chosen time (at least ten hours after the workflow's cron time, so 22:30 UTC or later with the default 12:17 UTC). If a browser tool
   connected to the user's own Chrome is available and the user says yes, you may open
   chatgpt.com in their signed-in session and do this for them; stop if a sign-in is needed.
 - **Claude cloud routine / desktop task / Codex**: install the skill (copy `skills/fewpapers`
