@@ -4,7 +4,7 @@ name: daily candidates
 
 on:
   schedule:
-    - cron: "17 12 * * *"   # 12:17 UTC; scheduled runs have started up to ten hours late, so leave room before the morning read
+    - cron: "17 11 * * *"   # 11:17 UTC; scheduled runs have started up to ten hours late, so leave room before the morning read
   workflow_dispatch:
     inputs:
       no_state:

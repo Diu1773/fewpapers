@@ -7,6 +7,7 @@
 from __future__ import annotations
 
 import argparse
+import math
 import json
 import sys
 from datetime import date, datetime, timedelta, timezone
@@ -52,10 +53,11 @@ def _landmark_jobs(prof: Profile, today: date) -> list:
     parts = []
     if lm.rising and lm.journals and today >= real_today - timedelta(days=2):
         parts.append(("rising", lambda: fetch_openalex_rising(lm.journals, lm.rising_days, today,
-                                                              lm.rising_min_citations, 50, prof.openalex_mailto),
-                      lambda ps: [_mark(p, "rising") for p in ps], lm.rising_candidates))
+                                                              lm.rising_min_citations, 200, prof.openalex_mailto),
+                      lambda ps: [_mark(p, "rising") for p in _by_field(ps, lm, _citation_weight)],
+                      lm.rising_candidates))
     parts.append(("hf_daily", lambda: fetch_hf_daily(lm.hf_days, today),
-                  lambda ps: score_landmark(ps, lm.labs, lm.min_upvotes), lm.candidates))
+                  lambda ps: _by_field(score_landmark(ps, lm.labs, lm.min_upvotes), lm), lm.candidates))
     if lm.journals:
         parts.append(("journals", lambda: fetch_openalex(lm.journals, [], lm.journal_lookback_days, today,
                                                          prof.openalex_mailto),
@@ -64,6 +66,31 @@ def _landmark_jobs(prof: Profile, today: date) -> list:
         parts.append(("feeds", lambda: fetch_feeds(lm.feeds, lm.lookback_days, today),
                       lambda ps: newest_per_feed(ps, lm.feed_max), 10 ** 6))
     return parts
+
+
+def _attention_weight(p) -> float:
+    return p.signals.get("attention", 0.0)
+
+
+def _citation_weight(p) -> float:
+    return min(math.log1p(p.signals.get("citations", 0)) / math.log1p(200), 1.0)
+
+
+def _by_field(papers: list, lm, weight=_attention_weight) -> list:
+    """Order papers by similarity to the landmark field, blended half and half with their attention
+    (upvotes and stars, or citations) so that neither alone decides."""
+    if not lm.topic or not papers:
+        return papers
+    attention = {id(p): p.score for p in papers}
+    ranked = score_papers(papers, lm.topic, lm.keywords, [], [])
+    if not ranked:
+        return ranked
+    top = max(p.score for p in ranked) or 1.0
+    for p in ranked:
+        p.signals.setdefault("attention", attention.get(id(p), 0.0))
+        p.score = round(0.5 * p.score / top + 0.5 * weight(p), 4)
+    ranked.sort(key=lambda p: p.score, reverse=True)
+    return ranked
 
 
 def _mark(p, kind: str):

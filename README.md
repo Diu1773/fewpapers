@@ -13,15 +13,25 @@ fewpapers sends at most a handful, each with one sentence on why it matters to y
 nothing on days when nothing qualifies.
 
 Every paper comes from a real index (arXiv, OpenAlex, NASA ADS, Hugging Face, feeds) before any model
-sees it. The assistant only chooses from that list, so it cannot invent a paper, and each reply
-opens with the list's own first lines so you can see which day's list it read.
+sees it. The assistant is told to choose only from that list, so every pick can be checked against
+it, and each reply opens with the list's title and count lines so you can see which day's list it
+read.
 
 ## Fastest start
 
-Give this repository to Claude Code or Codex and say **"set this up for me"**. The agent follows
-[`AGENTS.md`](AGENTS.md): it asks what you want to watch (or drafts it from your own repositories
-and notes), checks the sources, and lets you choose where the daily result arrives, such as a
-ChatGPT scheduled task, a Claude routine, a Codex automation, or just GitHub.
+Clone this repository, open it in an agent that can run commands (Claude Code or Codex), and say
+**"set this up for me"**. The agent follows [`AGENTS.md`](AGENTS.md):
+
+1. it asks a few plain questions, one at a time: what you work on, what you read, which field you
+   want the rare big papers from, whether others may see it, and where the result should arrive;
+2. it writes the profile, tries every source and shows you sample titles until they look right;
+3. after one yes, it creates a private runner repository, stores the profile as a secret and runs
+   the first collection;
+4. it leaves you only the connections: signing in to GitHub if needed, connecting the ChatGPT
+   GitHub app to that one repository, and pasting one prompt to schedule it.
+
+A chat-only assistant (a plain ChatGPT chat) cannot run these commands, so use it for the daily
+pick, not for setup.
 
 ## How it works
 
@@ -131,7 +141,7 @@ Python 3.11+, standard library only.
 - Some publishers do not deposit abstracts, so a few journal candidates are title-only.
 - The ADS source has not been exercised against the live service in this repository's tests.
 - GitHub starts scheduled runs late, by up to ten hours on this account's history, so the
-  workflows collect at 12:17 UTC for a morning read. Assistants' scheduled tasks can also skip a
+  workflows collect at 11:17 UTC for a morning read. Assistants' scheduled tasks can also skip a
   day without notice; the echoed first lines show when a reply came from an older list.
 - Fresh preprints often have no affiliations in OpenAlex yet, so "companies among the authors"
   is mostly empty for them.

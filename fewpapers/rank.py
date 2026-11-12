@@ -16,7 +16,8 @@ each here however paper study results show shows shown present presented propose
 one three between than other only well very data method methods approach approaches analysis using
 """.split())
 
-NON_RESEARCH = re.compile(r"^(correction|erratum|corrigendum|retraction|editorial|reply|comment on|addendum)\b", re.I)
+NON_RESEARCH = re.compile(r"^(correction|erratum|corrigendum|retraction|editorial|reply|comment on|addendum|"
+                          r"new products|in brief|news in brief|this week|research highlights?|books? in brief)\b", re.I)
 
 
 def tokens(text: str) -> list[str]:
