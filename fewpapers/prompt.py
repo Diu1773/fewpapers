@@ -27,6 +27,14 @@ T = {
                "A solid result within one subfield, a single theorem, a single device or disease-model "
                "result, incremental benchmark gains, surveys and product announcements do not count, "
                "whoever wrote them. For each, write one sentence on what would change if it holds up.",
+    "industry": "For each landmark pick, add four short lines between its sentence and its link, each starting "
+                "with its label: \"Industry:\" the industry and the part of its value chain the paper touches, "
+                "and whether it helps or threatens it; \"Made by:\" companies marked \"(company)\" in the "
+                "affiliations line or named in the org signal, or \"none listed\"; \"Stage:\" one of lab result, "
+                "code or model released, trial phase, product; \"News:\" use web search only for this line and "
+                "write the first major outlet and date that covered the paper, or \"none yet\". Take the first "
+                "three only from the file. This is information about industries, not investment advice: name "
+                "no stock tickers and give no buy or sell views.",
     "zero": "Most days the right answer is zero or one paper per track; never fill the slots for their own "
             "sake. Judge only from each title, abstract and signals; do not add claims the abstract does "
             "not make.",
@@ -43,7 +51,7 @@ LANG_NAME = {"en": "English", "ko": "Korean", "ja": "Japanese", "zh": "Chinese",
 
 
 def build_prompt(prof: Profile, url: str = "", lang: str = "en", n_work: int = 3, n_landmark: int = 3,
-                 repo: str = "") -> str:
+                 repo: str = "", industry: bool = False) -> str:
     """url: address of output/latest.md. repo: the repository that holds it, such as me/runner, opened
     with the assistant's GitHub app."""
     t = T
@@ -57,7 +65,10 @@ def build_prompt(prof: Profile, url: str = "", lang: str = "en", n_work: int = 3
     if prof.landmark.enabled:
         field = prof.landmark.topic or "the fields covered by the landmark track"
         lines += [t["lm_head"], field, "", t["lm_rule"].format(n=n_landmark), ""]
-        shape += ["[landmark]", "1. <short title> (<org or venue>)", f"   {t['why_lm']}", "   <link>", ""]
+        if industry:
+            lines += [t["industry"], ""]
+        extra = ["   Industry: ...", "   Made by: ...", "   Stage: ...", "   News: ..."] if industry else []
+        shape += ["[landmark]", "1. <short title> (<org or venue>)", f"   {t['why_lm']}", *extra, "   <link>", ""]
     lines += [t["zero"], "", t["shape"].format(lang=LANG_NAME.get(lang, lang)), ""]
     lines += t["echo"] + shape
     lines += [t["empty"]]

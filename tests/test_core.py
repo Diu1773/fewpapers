@@ -192,6 +192,15 @@ class TestPrompt(unittest.TestCase):
         self.assertIn("GitHub app", private)
         self.assertIn("Repository me/runner, branch main, file output/latest.md", private)
         self.assertNotIn("http", private.split("\n\n")[0])
+        os.environ[ENV_PROFILE] = '[profile]\ninterests = "battery capacity fade"\n[landmark]\nfield = "energy storage"\n'
+        try:
+            plain = build_prompt(load_profile(), "u")
+            rich = build_prompt(load_profile(), "u", industry=True)
+        finally:
+            del os.environ[ENV_PROFILE]
+        self.assertNotIn("Industry:", plain)
+        self.assertIn("name no stock tickers", rich)
+        self.assertLess(rich.index("   Industry: ..."), rich.rindex("   <link>"))
 
 
 class TestRank(unittest.TestCase):

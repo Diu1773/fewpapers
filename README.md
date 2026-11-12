@@ -12,6 +12,10 @@ Two tracks, either or both:
 fewpapers sends at most a handful, each with one sentence on why it matters to you, and sends
 nothing on days when nothing qualifies.
 
+Every paper comes from a real index (arXiv, OpenAlex, NASA ADS, Hugging Face, feeds) before any model
+sees it. The assistant only chooses from that list, so it cannot invent a paper, and each reply
+opens with the list's own first lines so you can see which day's list it read.
+
 ## Fastest start
 
 Give this repository to Claude Code or Codex and say **"set this up for me"**. The agent follows
@@ -32,18 +36,29 @@ ChatGPT scheduled task, a Claude routine, a Codex automation, or just GitHub.
      the newest posts of lab blogs and science news you follow.
    - Papers already listed are not listed again for 90 days.
 2. **Pick (your assistant).** A scheduled task reads the file and applies the rules printed by
-   `python -m fewpapers prompt`: a work pick needs one concrete sentence on which part of your
-   work it touches; a landmark pick must plausibly change how the field works. Zero is allowed.
+   `python -m fewpapers prompt`. A work pick must change what you would do soon (a method or data
+   you could adopt, a result that overtakes your approach, another group on the same problem);
+   "could be compared with" does not count. A landmark pick must be something people outside its
+   subfield will still talk about in a year; most days that is none. With `--industry`, each
+   landmark pick also gets the industry it touches, the companies among its authors, how far it is
+   from use, and its first news coverage. That is information about industries, not investment
+   advice.
 
 ```
+# Paper candidates 2026-11-12
+Fetched 412, 405 unique, 377 not listed before.
+
 [work]
 1. Early-cycle features predict end of life for fast-charged cells (Journal of Power Sources)
-   Predicts end of life from the first 100 cycles, which could shorten the test plan for the new cell.
+   Their first-100-cycle features could replace the 500-cycle screening step in the new cell test plan.
    https://doi.org/...
 
 [landmark]
 Nothing today.
 ```
+
+Each candidate in `output/latest.md` lists venue, date, authors, affiliations (companies marked
+and first), signals and abstract.
 
 ## Privacy
 
@@ -82,6 +97,7 @@ Your profile says what you are working on. Decide where it may be seen before yo
 python -m fewpapers                 # collect (same as: collect)
 python -m fewpapers check           # validate profile, try each source, resolve ISSNs
 python -m fewpapers prompt --url URL --lang ko --n-work 3 --n-landmark 3
+python -m fewpapers prompt --repo you/private-runner --industry   # read through the GitHub app
 python -m unittest discover -s tests
 ```
 
@@ -114,6 +130,11 @@ Python 3.11+, standard library only.
   Hugging Face before 2023 or for the rising part.
 - Some publishers do not deposit abstracts, so a few journal candidates are title-only.
 - The ADS source has not been exercised against the live service in this repository's tests.
+- GitHub starts scheduled runs late, by up to ten hours on this account's history, so the
+  workflows collect at 12:17 UTC for a morning read. Assistants' scheduled tasks can also skip a
+  day without notice; the echoed first lines show when a reply came from an older list.
+- Fresh preprints often have no affiliations in OpenAlex yet, so "companies among the authors"
+  is mostly empty for them.
 
 ## License
 

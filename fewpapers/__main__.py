@@ -165,7 +165,8 @@ def cmd_check(args) -> int:
 
 def cmd_prompt(args) -> int:
     prof = load_profile(args.profile)
-    sys.stdout.write(build_prompt(prof, args.url or "", args.lang, args.n_work, args.n_landmark, args.repo or ""))
+    sys.stdout.write(build_prompt(prof, args.url or "", args.lang, args.n_work, args.n_landmark, args.repo or "",
+                                  args.industry))
     return 0
 
 
@@ -197,6 +198,8 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--lang", default="en", help="reply language code, e.g. en, ko")
     p.add_argument("--n-work", type=int, default=3)
     p.add_argument("--n-landmark", type=int, default=3)
+    p.add_argument("--industry", action="store_true",
+                   help="add industry, makers, stage and first news coverage under each landmark pick")
     p.set_defaults(func=cmd_prompt)
 
     args = ap.parse_args(argv)
