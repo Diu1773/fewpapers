@@ -134,6 +134,18 @@ class TestStore(unittest.TestCase):
 
 
 class TestLandmark(unittest.TestCase):
+    def test_hn_parse_links_arxiv_and_keeps_points(self):
+        from fewpapers.sources import parse_hn
+        ps = parse_hn(json.loads((FIX / "hn.json").read_text(encoding="utf-8"))["hits"])
+        self.assertEqual(len(ps), 3)  # the story without a title is dropped
+        self.assertEqual(ps[0].signals["hn_points"], 2890)
+        self.assertEqual(ps[0].venue, "Hacker News")
+        self.assertEqual(ps[1].arxiv_id, "2611.01234")  # so it merges with the arXiv record of the same paper
+        self.assertEqual(ps[2].url, "https://news.ycombinator.com/item?id=103")  # text post links to its thread
+        self.assertEqual(ps[2].abstract, "Share papers")
+        md = render_markdown({"landmark": ps[:1]}, date(2026, 11, 21), {}, {})
+        self.assertIn("hacker news 2890 points, 1200 comments", md)
+
     def test_hf_daily_parse(self):
         items = [{"paper": {"id": "2611.00001", "title": "A new architecture", "summary": "We propose.",
                             "upvotes": 150, "githubStars": 900, "authors": [{"name": "X"}],

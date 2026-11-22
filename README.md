@@ -40,11 +40,12 @@ pick, not for setup.
    - work: arXiv categories, journals by ISSN and free-text searches across all venues via
      OpenAlex, and NASA ADS (optional); merged, corrections dropped, ranked by text similarity to
      your profile.
-   - landmark, in four parts: recent top-journal papers already gathering citations (late
-     risers); Hugging Face daily papers ranked by upvotes, code stars and watched labs (with
-     `follow_field`, both of these are also ordered by closeness to your field); this
-     week's top-journal papers (Nature, Science, PRL, ...) ranked by similarity to your field; and
-     the newest posts of lab blogs and science news you follow.
+   - landmark, in five parts: recent top-journal papers already gathering citations (late
+     risers); Hugging Face daily papers ranked by upvotes, code stars and watched labs; this
+     week's top-journal papers (Nature, Science, PRL, ...) ranked by similarity to your field;
+     stories with many Hacker News points in the last two days, which catch claims and
+     announcements before any paper exists; and the newest posts of lab blogs and science news you
+     follow. With `follow_field`, the first two parts are also ordered by closeness to your field.
    - Papers already listed are not listed again for 90 days.
 2. **Pick (your assistant).** A scheduled task reads the file and applies the rules printed by
    `python -m fewpapers prompt`. A work pick must change what you would do soon (a method or data
@@ -130,6 +131,7 @@ Python 3.11+, standard library only.
 | `landmark.rising*` | recent papers in those journals that already gather citations (not replayable for past dates) |
 | `landmark.feeds`, `feed_max` | lab blog and science news feeds; the newest `feed_max` posts of each |
 | `landmark.min_upvotes` | papers outside watched labs need this many upvotes |
+| `landmark.hn`, `hn_days`, `hn_min_points`, `hn_candidates` | Hacker News stories from the last `hn_days` days with at least `hn_min_points`, most points first; Ask/Show HN threads dropped |
 | `landmark.follow_field` | also order the rising and Hugging Face parts by closeness to `field`; for a specific field such as batteries, not for a broad one |
 
 ## Limits

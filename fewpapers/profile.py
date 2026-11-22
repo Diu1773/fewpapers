@@ -34,6 +34,10 @@ class Landmark:
     rising_min_citations: int = 5
     rising_candidates: int = 5
     follow_field: bool = False  # order rising and community papers by similarity to `field` too
+    hn: bool = True             # stories already widely discussed on Hacker News
+    hn_days: int = 2
+    hn_min_points: int = 300
+    hn_candidates: int = 6
 
 
 @dataclass
@@ -98,6 +102,10 @@ def _from_dict(d: dict, base_dir: Path) -> Profile:
             rising_min_citations=int(lm.get("rising_min_citations", 5)),
             rising_candidates=int(lm.get("rising_candidates", 5)),
             follow_field=bool(lm.get("follow_field", False)),
+            hn=bool(lm.get("hn", True)),
+            hn_days=int(lm.get("hn_days", 2)),
+            hn_min_points=int(lm.get("hn_min_points", 300)),
+            hn_candidates=int(lm.get("hn_candidates", 6)),
         ),
         base_dir=base_dir,
     )

@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import argparse
 import math
+import re
 import json
 import sys
 from datetime import date, datetime, timedelta, timezone
@@ -16,8 +17,8 @@ from pathlib import Path
 from .profile import Profile, load_profile
 from .prompt import build_prompt
 from .rank import load_library, score_landmark, score_papers
-from .sources import (add_affiliations, fetch_ads, fetch_arxiv, fetch_feeds, fetch_hf_daily, fetch_openalex,
-                      fetch_openalex_rising, newest_per_feed)
+from .sources import (add_affiliations, fetch_ads, fetch_arxiv, fetch_feeds, fetch_hf_daily, fetch_hn,
+                      fetch_openalex, fetch_openalex_rising, newest_per_feed)
 from .store import dedupe, filter_unseen, keys, load_seen, update_seen, write_outputs
 
 
@@ -63,10 +64,17 @@ def _landmark_jobs(prof: Profile, today: date) -> list:
         parts.append(("journals", lambda: fetch_openalex(lm.journals, [], lm.journal_lookback_days, today,
                                                          prof.openalex_mailto),
                       lambda ps: score_papers(ps, lm.topic, lm.keywords, [], []), lm.journal_candidates))
+    if lm.hn and lm.hn_candidates > 0:
+        parts.append(("hn", lambda: fetch_hn(lm.hn_days, lm.hn_min_points, today),
+                      lambda ps: [_mark(p, "hn") for p in sorted(ps, key=lambda p: -p.signals.get("hn_points", 0))
+                                  if not HN_THREADS.match(p.title)], lm.hn_candidates))
     if lm.feeds:
         parts.append(("feeds", lambda: fetch_feeds(lm.feeds, lm.lookback_days, today),
                       lambda ps: newest_per_feed(ps, lm.feed_max), 10 ** 6))
     return parts
+
+
+HN_THREADS = re.compile(r"^(ask|tell|show|launch) hn\b", re.I)  # discussion threads and product posts
 
 
 def _attention_weight(p) -> float:

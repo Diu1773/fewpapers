@@ -1,0 +1,6 @@
+{"hits": [
+ {"objectID": "101", "title": "A claimed proof of a famous conjecture [pdf]", "url": "https://example.org/proof.pdf", "points": 2890, "num_comments": 1200, "created_at": "2026-11-20T14:16:00Z", "story_text": null},
+ {"objectID": "102", "title": "Fast solid-state battery", "url": "https://arxiv.org/abs/2611.01234", "points": 450, "num_comments": 80, "created_at": "2026-11-21T09:00:00Z"},
+ {"objectID": "103", "title": "Ask HN: what are you reading?", "url": null, "points": 320, "num_comments": 400, "created_at": "2026-11-21T10:00:00Z", "story_text": "<p>Share <i>papers</i></p>"},
+ {"objectID": "104", "title": "", "url": "https://example.org", "points": 999, "created_at": "2026-11-21T10:00:00Z"}
+]}

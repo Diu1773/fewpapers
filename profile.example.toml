@@ -62,6 +62,12 @@ rising_days = 90
 rising_min_citations = 5
 rising_candidates = 5
 
+# Stories already widely discussed on Hacker News (claims and announcements, not only papers).
+hn = true
+hn_days = 2
+hn_min_points = 300
+hn_candidates = 6
+
 # Lab blogs and science news: the newest `feed_max` posts of each feed within `lookback_days`.
 lookback_days = 3
 feed_max = 2

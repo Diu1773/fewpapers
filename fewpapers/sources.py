@@ -10,7 +10,7 @@ import urllib.parse
 import urllib.request
 import xml.etree.ElementTree as ET
 from dataclasses import dataclass, field
-from datetime import date, datetime, timedelta
+from datetime import date, datetime, timedelta, timezone
 from email.utils import parsedate_to_datetime
 
 USER_AGENT = "Mozilla/5.0 (compatible; fewpapers/0.2)"
@@ -308,6 +308,47 @@ def fetch_hf_daily(days: int, today: date) -> list[Paper]:
                 continue  # today's list may not exist yet
             raise
         papers.extend(parse_hf_daily(items))
+    return papers
+
+
+# Hacker News -----------------------------------------------------------------
+
+def parse_hn(hits: list[dict]) -> list[Paper]:
+    out = []
+    for h in hits:
+        title = _clean(h.get("title"))
+        if not title:
+            continue
+        hn_url = f"https://news.ycombinator.com/item?id={h.get('objectID', '')}"
+        url = h.get("url") or hn_url
+        m = re.search(r"arxiv\.org/(?:abs|pdf)/(\d{4}\.\d{4,5})", url)
+        aid = m.group(1) if m else ""
+        out.append(Paper(
+            title=title,
+            abstract=_clean(re.sub(r"<[^>]+>", " ", h.get("story_text") or "")),
+            url=url,
+            venue="Hacker News",
+            published=(h.get("created_at") or "")[:10],
+            source="hn",
+            arxiv_id=aid,
+            doi=f"10.48550/arxiv.{aid}" if aid else "",
+            signals={"hn_points": int(h.get("points") or 0), "hn_comments": int(h.get("num_comments") or 0),
+                     "hn_url": hn_url},
+        ))
+    return out
+
+
+def fetch_hn(days: int, min_points: int, today: date) -> list[Paper]:
+    """Stories posted in the last `days` days with at least `min_points`, most points first.
+    Points are as of the request, so a replayed date sees today's totals."""
+    end = datetime(today.year, today.month, today.day, tzinfo=timezone.utc) + timedelta(days=1)
+    start = end - timedelta(days=days)
+    params = {"tags": "story", "hitsPerPage": 100,
+              "numericFilters": f"created_at_i>{int(start.timestamp())},created_at_i<{int(end.timestamp())},"
+                                f"points>={min_points}"}
+    data = json.loads(_get("https://hn.algolia.com/api/v1/search?" + urllib.parse.urlencode(params)))
+    papers = parse_hn(data.get("hits", []))
+    papers.sort(key=lambda p: p.signals["hn_points"], reverse=True)
     return papers
 
 

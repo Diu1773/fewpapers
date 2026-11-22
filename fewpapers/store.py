@@ -8,7 +8,7 @@ from pathlib import Path
 
 from .sources import Paper
 
-SOURCE_RANK = {"openalex": 0, "ads": 1, "hf": 2, "arxiv": 3, "feed": 4}  # prefer the journal record when duplicates meet
+SOURCE_RANK = {"openalex": 0, "ads": 1, "hf": 2, "arxiv": 3, "feed": 4, "hn": 5}  # prefer the journal record when duplicates meet
 ABSTRACT_CHARS = 900
 AFFILIATIONS_SHOWN = 4
 
@@ -76,8 +76,9 @@ TRACK_NOTES = {
     "work": "Ranked by text similarity to the reader's current work. Scores order candidates; they do not judge importance.",
     "landmark": "In order: recent top-journal papers already gathering citations (rising); community-tracked "
                 "papers that passed an upvote, code-star or watched-lab bar; this week's top-journal papers ranked by "
-                "similarity to the field; the newest posts of each followed feed. Signals show early attention, "
-                "not lasting importance.",
+                "similarity to the field; stories already widely discussed on Hacker News, which may be claims, "
+                "announcements or preprints rather than reviewed papers; the newest posts of each followed feed. "
+                "Signals show early attention, not lasting importance.",
 }
 
 
@@ -92,6 +93,8 @@ def _signal_text(p: Paper) -> str:
         parts.append(f"org {s['org']}")
     if s.get("watched_lab"):
         parts.append(f"watched lab: {s['watched_lab']}")
+    if s.get("hn_points"):
+        parts.append(f"hacker news {s['hn_points']} points, {s.get('hn_comments', 0)} comments: {s.get('hn_url', '')}")
     if s.get("feed"):
         parts.append(f"feed: {s['feed']}")
     if s.get("kind") == "rising":

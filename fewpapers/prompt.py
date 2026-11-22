@@ -26,7 +26,8 @@ T = {
                "first demonstration that changes what is possible, or a resource a whole field will use. "
                "A solid result within one subfield, a single theorem, a single device or disease-model "
                "result, incremental benchmark gains, surveys and product announcements do not count, "
-               "whoever wrote them. For each, write one sentence on what would change if it holds up.",
+               "whoever wrote them. A result many people are already discussing (high Hacker News points) can "
+               "count even before it is a reviewed paper; then say it is a claim not yet checked by others. For each, write one sentence on what would change if it holds up.",
     "industry": "For each landmark pick, add four short lines between its sentence and its link, each starting "
                 "with its label: \"Industry:\" the industry and the part of its value chain the paper touches, "
                 "and whether it helps or threatens it; \"Made by:\" companies marked \"(company)\" in the "
