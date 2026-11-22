@@ -22,7 +22,7 @@ Rules for the whole setup:
 - Ask about content only: what they work on, what they read, which field they follow. Never ask
   for ISSNs, arXiv category codes, cron times or file names; work those out yourself and say what
   you chose.
-- Use defaults unless the user objects, and state them once: work 3 and landmark 3 picks a day,
+- Use defaults unless the user objects, and state them once: at most three papers a day, only those scored 3 or more out of 5,
   private repository, collection at 11:17 UTC, the pick at 07:00 in the user's time zone.
 - Never create a public repository, push, store a secret, or open a website without a yes. Ask for
   that yes once, for the whole plan, in step 4.

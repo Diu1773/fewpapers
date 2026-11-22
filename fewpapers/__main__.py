@@ -202,7 +202,7 @@ def cmd_check(args) -> int:
 
 def cmd_prompt(args) -> int:
     prof = load_profile(args.profile)
-    sys.stdout.write(build_prompt(prof, args.url or "", args.lang, args.n_work, args.n_landmark, args.repo or "",
+    sys.stdout.write(build_prompt(prof, args.url or "", args.lang, args.max, args.repo or "",
                                   args.industry))
     return 0
 
@@ -233,10 +233,9 @@ def main(argv: list[str] | None = None) -> int:
     where.add_argument("--url", help="raw URL (or local path) of output/latest.md")
     where.add_argument("--repo", help="owner/name of a private repository the assistant reads through its GitHub app")
     p.add_argument("--lang", default="en", help="reply language code, e.g. en, ko")
-    p.add_argument("--n-work", type=int, default=3)
-    p.add_argument("--n-landmark", type=int, default=3)
+    p.add_argument("--max", type=int, default=3, help="at most this many papers a day, scored 3 or more")
     p.add_argument("--industry", action="store_true",
-                   help="add industry, makers, stage and first news coverage under each landmark pick")
+                   help="add industry, makers, stage and first news coverage under papers scored 4 or 5")
     p.set_defaults(func=cmd_prompt)
 
     args = ap.parse_args(argv)

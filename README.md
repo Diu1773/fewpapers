@@ -47,26 +47,32 @@ pick, not for setup.
      announcements before any paper exists; and the newest posts of lab blogs and science news you
      follow. With `follow_field`, the first two parts are also ordered by closeness to your field.
    - Papers already listed are not listed again for 90 days.
-2. **Pick (your assistant).** A scheduled task reads the file and applies the rules printed by
-   `python -m fewpapers prompt`. A work pick must change what you would do soon (a method or data
-   you could adopt, a result that overtakes your approach, another group on the same problem);
-   "could be compared with" does not count. A landmark pick must be something people outside its
-   subfield will still talk about in a year; most days that is none. With `--industry`, each
-   landmark pick also gets the industry it touches, the companies among its authors, how far it is
-   from use, and its first news coverage. That is information about industries, not investment
-   advice.
+2. **Pick (your assistant).** A scheduled task reads the file and scores every candidate from 1 to
+   5 with the rules printed by `python -m fewpapers prompt`:
+   - 5: general news outside science within weeks (a few a year, such as AlphaFold2);
+   - 4: still cited across fields in a few years (about one a month, such as GraphCast);
+   - 3: changes what you would do in your work soon, or is already talked about beyond its subfield;
+   - 1-2: left out.
+
+   Only 3 or more is reported, at most three a day. The first line is written for the phone
+   notification, so a glance tells you whether to open it; most days it says there is nothing.
+   With `--industry`, papers scored 4 or 5 also get the industry they touch, the companies among
+   their authors, how far they are from use, and their first news coverage. That is information
+   about industries, not investment advice.
 
 ```
-# Paper candidates 2026-11-12
-Fetched 412, 405 unique, 377 not listed before.
+[4] Solid-state cell, 10k cycles · [3] Early-cycle life prediction
 
-[work]
-1. Early-cycle features predict end of life for fast-charged cells (Journal of Power Sources)
+[4] Solid-state cell keeps 90% after 10,000 cycles (Nature Energy) - the world
+   If it holds up, fast-charging cells could outlast the vehicles they power.
+   https://doi.org/...
+
+[3] Early-cycle features predict end of life (Journal of Power Sources) - my work
    Their first-100-cycle features could replace the 500-cycle screening step in the new cell test plan.
    https://doi.org/...
 
-[landmark]
-Nothing today.
+# Paper candidates 2026-11-12
+Fetched 412, 405 unique, 377 not listed before.
 ```
 
 Each candidate in `output/latest.md` lists venue, date, authors, affiliations (companies marked
@@ -108,7 +114,7 @@ Your profile says what you are working on. Decide where it may be seen before yo
 ```bash
 python -m fewpapers                 # collect (same as: collect)
 python -m fewpapers check           # validate profile, try each source, resolve ISSNs
-python -m fewpapers prompt --url URL --lang ko --n-work 3 --n-landmark 3
+python -m fewpapers prompt --url URL --lang ko --max 3
 python -m fewpapers prompt --repo you/private-runner --industry   # read through the GitHub app
 python -m unittest discover -s tests
 ```

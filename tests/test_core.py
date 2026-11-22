@@ -186,16 +186,19 @@ class TestPrompt(unittest.TestCase):
     def test_prompt_covers_enabled_tracks(self):
         os.environ[ENV_PROFILE] = '[profile]\ninterests = "battery capacity fade"\n[landmark]\nfield = "machine learning"\n'
         try:
-            text = build_prompt(load_profile(), "https://example.org/latest.md", "ko", 5, 3)
+            text = build_prompt(load_profile(), "https://example.org/latest.md", "ko", 2)
         finally:
             del os.environ[ENV_PROFILE]
         self.assertIn("https://example.org/latest.md", text)
         self.assertIn("battery capacity fade", text)
         self.assertIn("machine learning", text)
         self.assertIn("Korean", text)
-        self.assertIn("[work]", text)
-        self.assertIn("[landmark]", text)
-        self.assertLess(text.index("copied exactly"), text.index("[work]"))  # the reply opens with the file's own lines
+        self.assertIn("at most 2 a day", text)
+        for level in ("5 - ", "4 - ", "3 - ", "1-2 - "):
+            self.assertIn(level, text)
+        reply = text[text.index("Reply in"):]
+        self.assertLess(reply.index("phone notification"), reply.index("[<score>]"))  # headline first
+        self.assertLess(reply.index("[<score>]"), reply.index("copied exactly"))  # file lines last
         os.environ[ENV_PROFILE] = '[profile]\ninterests = "battery capacity fade"\n'
         try:
             private = build_prompt(load_profile(), repo="me/runner")
@@ -211,8 +214,8 @@ class TestPrompt(unittest.TestCase):
         finally:
             del os.environ[ENV_PROFILE]
         self.assertNotIn("Industry:", plain)
-        self.assertIn("name no stock tickers", rich)
-        self.assertLess(rich.index("   Industry: ..."), rich.rindex("   <link>"))
+        self.assertIn("no stock tickers", rich)
+        self.assertLess(rich.index("for scores 4 and 5 only"), rich.rindex("   <link>"))
 
 
 class TestRank(unittest.TestCase):

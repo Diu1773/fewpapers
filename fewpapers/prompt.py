@@ -11,66 +11,67 @@ T = {
     "repo_file": "Repository {repo}, branch main, file output/latest.md",
     "about": "It lists today's paper candidates in up to two tracks. Scores and signals only order "
              "the candidates; they do not decide importance.",
-    "work_head": "Track work - my current work:",
-    "work_rule": "From track work, pick at most {n}. A paper qualifies only if it would change what I do "
-                 "in my current work soon: a method, dataset or code I could adopt directly; a result that "
-                 "contradicts, overtakes or invalidates my approach; or another group solving the same "
-                 "problem with the same kind of data. Being a possible comparison, reference or background, "
-                 "or sharing a topic, does not qualify; nor does a software or data deposit I would not use "
-                 "myself. Write the sentence as what I would do differently. If the honest sentence is "
-                 "\"it could be compared with\" or \"it could serve as a reference\", leave the paper out.",
-    "lm_head": "Track landmark - the field I follow:",
-    "lm_rule": "From track landmark, pick at most {n}, and expect zero on most days. Include a paper only "
-               "if people outside its subfield would still be talking about it a year from now: a new "
-               "architecture, training method or paradigm, a scaling result or clear capability jump, a "
-               "first demonstration that changes what is possible, or a resource a whole field will use. "
-               "A solid result within one subfield, a single theorem, a single device or disease-model "
-               "result, incremental benchmark gains, surveys and product announcements do not count, "
-               "whoever wrote them. A result many people are already discussing (high Hacker News points) can "
-               "count even before it is a reviewed paper; then say it is a claim not yet checked by others. For each, write one sentence on what would change if it holds up.",
-    "industry": "For each landmark pick, add four short lines between its sentence and its link, each starting "
-                "with its label: \"Industry:\" the industry and the part of its value chain the paper touches, "
-                "and whether it helps or threatens it; \"Made by:\" companies marked \"(company)\" in the "
-                "affiliations line or named in the org signal, or \"none listed\"; \"Stage:\" one of lab result, "
-                "code or model released, trial phase, product; \"News:\" use web search only for this line and "
-                "write the first major outlet and date that covered the paper, or \"none yet\". Take the first "
-                "three only from the file. This is information about industries, not investment advice: name "
-                "no stock tickers and give no buy or sell views.",
-    "zero": "Most days the right answer is zero or one paper per track; never fill the slots for their own "
-            "sake. Judge only from each title, abstract and signals; do not add claims the abstract does "
-            "not make.",
-    "shape": "Reply in {lang} in exactly this shape and nothing else (no greeting, no recap of the list):",
-    "empty": "If a track has no pick, write one line saying so under its heading. If the file cannot be "
-             "opened or its first line is more than two days old, reply with one line saying so.",
-    "echo": ["<the file's first line, copied exactly>", "<the file's line that starts with \"Fetched\", copied exactly>", ""],
-    "why_work": "<one sentence: where it touches my work>",
-    "why_lm": "<one sentence: what changes if it holds up>",
+    "work_head": "My current work:",
+    "field_head": "The fields I follow:",
+    "scale": "Score every candidate from 1 to 5 for how much it matters to me. Report only those that score 3 "
+             "or more, at most {n} a day, highest first. Most days nothing reaches 3; never raise a score to "
+             "fill the reply.",
+    "s5": "5 - It will be general news outside science within weeks and changes what people think AI or "
+          "science can do; a few a year worldwide. Give 5 only when broad attention is already visible (very "
+          "high Hacker News points, major news outlets) or the abstract shows a first of its kind on that "
+          "scale. Examples: AlphaFold2, GPT-3, CRISPR-Cas9 genome editing, the first detection of "
+          "gravitational waves.",
+    "s4": "4 - People outside its field will still talk about it and cite it in a few years; the kind of "
+          "result that ends up in a field's list of results of the year. At most about one a month across "
+          "everything. Examples: Diffusion Policy, 3D Gaussian Splatting, GraphCast, LoRA.",
+    "s3": "3 - Either it would change what I do in my current work soon (a method, dataset or code I would "
+          "adopt, a result that contradicts or overtakes my approach, another group solving the same problem "
+          "with the same kind of data), or it is a result that people outside its subfield are already "
+          "talking about. Being a possible comparison or reference, or sharing a topic, is not enough; "
+          "neither are incremental benchmark gains, surveys or product announcements, whoever wrote them.",
+    "s12": "1-2 - Leave out.",
+    "claims": "A result many people are already discussing (high Hacker News points) can score even before it "
+              "is a reviewed paper; then say it is a claim not yet checked by others. Judge only from each "
+              "title, abstract and signals; do not add claims the abstract does not make.",
+    "shape": "Reply in {lang}, in exactly this shape and nothing else (no greeting, no recap):",
+    "headline": "<one line for the phone notification: each reported paper as [score] and a short title of at "
+                "most 25 characters, joined by \" · \", for example \"[4] Nuclear clock realized · [3] Cn2 "
+                "profiles by stability\". If nothing scores 3 or more, write that there is nothing today and "
+                "skip to the last two lines.>",
+    "item": "[<score>] <short title> (<venue or org>) - <my work or the world>",
+    "why": "   <one sentence: for my work, what I would do differently; for the world, what changes if it holds "
+           "up. Say it is a claim not yet checked for results that are not reviewed papers.>",
+    "industry": "   <for scores 4 and 5 only, four short lines starting with \"Industry:\", \"Made by:\", "
+                "\"Stage:\", \"News:\". Industry: the industry and part of its value chain it touches. Made by: "
+                "companies marked \"(company)\" in the affiliations line or named in the org signal, or none. "
+                "Stage: lab result, code or model released, trial phase, or product. News: use web search only "
+                "for this line; the first major outlet and date, or none yet. This is information about "
+                "industries, not investment advice: no stock tickers, no buy or sell views.>",
+    "link": "   <link>",
+    "echo": ["<the file's first line, copied exactly>", "<the file's line that starts with \"Fetched\", copied exactly>"],
+    "stale": "If the file cannot be opened or its first line is more than two days old, reply with one line "
+             "saying so.",
 }
 
 LANG_NAME = {"en": "English", "ko": "Korean", "ja": "Japanese", "zh": "Chinese", "de": "German",
              "fr": "French", "es": "Spanish"}
 
 
-def build_prompt(prof: Profile, url: str = "", lang: str = "en", n_work: int = 3, n_landmark: int = 3,
+def build_prompt(prof: Profile, url: str = "", lang: str = "en", max_picks: int = 3,
                  repo: str = "", industry: bool = False) -> str:
     """url: address of output/latest.md. repo: the repository that holds it, such as me/runner, opened
-    with the assistant's GitHub app."""
+    with the assistant's GitHub app. The reply opens with one notification line and lists only
+    candidates scored 3 or more on a 1-5 scale."""
     t = T
     head = [t["open_repo"], t["repo_file"].format(repo=repo)] if repo else [t["open"], url]
     lines = head + ["", t["about"], ""]
-    shape = []
     if prof.work_enabled:
-        interests = prof.interests or ", ".join(prof.keywords)
-        lines += [t["work_head"], interests, "", t["work_rule"].format(n=n_work), ""]
-        shape += ["[work]", "1. <short title> (<venue>)", f"   {t['why_work']}", "   <link>", ""]
+        lines += [t["work_head"], prof.interests or ", ".join(prof.keywords), ""]
     if prof.landmark.enabled:
-        field = prof.landmark.topic or "the fields covered by the landmark track"
-        lines += [t["lm_head"], field, "", t["lm_rule"].format(n=n_landmark), ""]
-        if industry:
-            lines += [t["industry"], ""]
-        extra = ["   Industry: ...", "   Made by: ...", "   Stage: ...", "   News: ..."] if industry else []
-        shape += ["[landmark]", "1. <short title> (<org or venue>)", f"   {t['why_lm']}", *extra, "   <link>", ""]
-    lines += [t["zero"], "", t["shape"].format(lang=LANG_NAME.get(lang, lang)), ""]
-    lines += t["echo"] + shape
-    lines += [t["empty"]]
+        lines += [t["field_head"], prof.landmark.topic or "the fields covered by the landmark track", ""]
+    lines += [t["scale"].format(n=max_picks), "", t["s5"], t["s4"], t["s3"], t["s12"], "", t["claims"], ""]
+    lines += [t["shape"].format(lang=LANG_NAME.get(lang, lang)), "", t["headline"], "", t["item"], t["why"]]
+    if industry:
+        lines.append(t["industry"])
+    lines += [t["link"], ""] + t["echo"] + ["", t["stale"]]
     return "\n".join(lines).strip() + "\n"
